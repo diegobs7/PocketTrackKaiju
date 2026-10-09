@@ -6,7 +6,7 @@ data class Producto (
     val descripcion:String,
     val categoria: String,
     val tipo: String,
-    val precio: Double,
+    val precio: Int,
     val stockActual: Int,
     val stockMinimo: Int,
     val detalle: String?=null
