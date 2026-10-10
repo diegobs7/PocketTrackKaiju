@@ -4,6 +4,7 @@
 .kotlin/errors/
 /.idea/caches
 .idea/
+.kotlin/
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
