@@ -22,8 +22,7 @@ class LoginViewModel : ViewModel() {
 
         val errorEmail = when {
             estado.email.isBlank() -> "El correo es obligatorio."
-            !EMAIL_REGEX.matches(estado.email.trim()) -> "Correo invalido."
-            !tieneDominioPermitido(estado.email) -> "\"Usa un correo @duocuc.cl, @profesor.duoc.cl o @gmail.com\""
+            !EMAIL_REGEX.matches(estado.email.trim()) -> "Ingresa un correo valido."
             else -> null
         }
 
@@ -41,15 +40,11 @@ class LoginViewModel : ViewModel() {
 
     fun iniciarSesion(): Boolean {
         if(!validarFormulario()) return false
+        _estadoFormulario.value = FormularioLogin()
         return true
-    }
-    private fun tieneDominioPermitido(email: String): Boolean {
-        val dominio = email.trim().substringAfterLast("@").lowercase()
-        return dominio in DOMINIOS_PERMITIDOS
     }
     private companion object {
         val EMAIL_REGEX = Regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")
-        val DOMINIOS_PERMITIDOS = listOf("duocuc.cl", "profesor.duoc.cl", "gmail.com")
     }
 
 }
