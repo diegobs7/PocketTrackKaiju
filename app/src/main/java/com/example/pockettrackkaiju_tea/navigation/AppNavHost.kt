@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Store
@@ -20,6 +21,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaInicioSesion
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaPerfilUsuario
 import com.example.pockettrackkaiju_tea.viewmodel.LoginViewModel
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaRegistroUsuario
+import androidx.navigation.NavGraph.Companion.findStartDestination
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,15 +34,35 @@ fun MiNavHost(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val rutaActual = backStackEntry?.destination?.route
 
-    val mostrarBarraInferior = rutaActual != null && rutaActual != Rutas.InicioSesion.ruta
+    val rutasSinBarra = listOf(Rutas.InicioSesion.ruta, Rutas.RegistroUsuario.ruta)
+    val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
+    val mostrarBotonAtras = rutaActual in rutasSinBarra
+    val navegarAPestana: (String) -> Unit = {ruta -> navController.navigate(ruta) {
+        popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    } }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("PocketTrack Kaiju") },
+                title = {Text("PocketTrack Kaiju")},
+                navigationIcon = {
+                    if (mostrarBotonAtras) {
+                        IconButton(onClick = {navController.popBackStack()}) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Volver"
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         },
@@ -48,31 +71,19 @@ fun MiNavHost(
                 NavigationBar {
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Inicio.ruta,
-                        onClick = {
-                            navController.navigate(Rutas.Inicio.ruta) {
-                                launchSingleTop = true
-                            }
-                        },
+                        onClick = { navegarAPestana(Rutas.Inicio.ruta) },
                         icon = { Icon(Icons.Filled.Home, contentDescription = "Inicio") },
                         label = { Text("Inicio") }
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Producto.ruta,
-                        onClick = {
-                            navController.navigate(Rutas.Producto.ruta) {
-                                launchSingleTop = true
-                            }
-                        },
+                        onClick = { navegarAPestana(Rutas.Producto.ruta) },
                         icon = { Icon(Icons.Filled.Store, contentDescription = "Productos") },
                         label = { Text("Productos") }
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Perfil.ruta,
-                        onClick = {
-                            navController.navigate(Rutas.Perfil.ruta) {
-                                launchSingleTop = true
-                            }
-                        },
+                        onClick = { navegarAPestana(Rutas.Perfil.ruta) },
                         icon = { Icon(Icons.Filled.Person, contentDescription = "Perfil") },
                         label = { Text("Perfil") }
                     )
@@ -90,9 +101,14 @@ fun MiNavHost(
             composable(Rutas.InicioSesion.ruta) {
                 PantallaInicioSesion(
                     viewModel = loginViewModel,
-                    onLoginExitoso = {
-                        navController.popBackStack()
-                    }
+                    onLoginExitoso = {navController.popBackStack() },
+                    onIrRegistro = { navController.navigate(Rutas.RegistroUsuario.ruta) }
+                )
+            }
+
+            composable(Rutas.RegistroUsuario.ruta) {
+                PantallaRegistroUsuario(
+                    onRegistroExitoso = {navController.popBackStack()}
                 )
             }
 
