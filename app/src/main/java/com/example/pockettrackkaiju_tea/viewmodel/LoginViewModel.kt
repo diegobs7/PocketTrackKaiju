@@ -27,8 +27,8 @@ class LoginViewModel : ViewModel() {
         }
 
         val errorPassword = when {
-            estado.password.isBlank() -> "La contrasena es obligatoria."
-            estado.password.length < 4 -> "La contrasena debe tener minimo 4 caracteres"
+            estado.password.isBlank() -> "La contraseña es obligatoria."
+            estado.password.length < 4 -> "La contraseña debe tener minimo 4 caracteres"
             else -> null
         }
 
