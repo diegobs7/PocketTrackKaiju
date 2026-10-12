@@ -16,6 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -76,37 +78,67 @@ fun MiNavHost(
                         selected = rutaActual == Rutas.Inicio.ruta,
                         onClick = { navegarAPestana(Rutas.Inicio.ruta) },
                         icon = { Icon(Icons.Filled.Home, contentDescription = "Inicio") },
-                        label = { Text("Inicio") }
+                        label = { Text(
+                            text = "Inicio",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 10.sp
+                        )}
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Producto.ruta,
                         onClick = { navegarAPestana(Rutas.Producto.ruta) },
                         icon = { Icon(Icons.Filled.Store, contentDescription = "Productos") },
-                        label = { Text("Catalogo") }
+                        label = { Text(
+                            text = "Producto",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 10.sp
+                        )}
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Movimiento.ruta,
                         onClick = {navegarAPestana(Rutas.Movimiento.ruta)},
                         icon = {Icon(Icons.Filled.Moving, contentDescription = "Movimiento")},
-                        label = {Text("Movimiento")}
+                        label = {Text(
+                            text = "Movimiento",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 10.sp
+                        )}
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Alerta.ruta,
                         onClick = {navegarAPestana(Rutas.Alerta.ruta)},
                         icon = {Icon(Icons.Filled.AddAlert, contentDescription = "Alerta")},
-                        label = {Text("Alertas")}
+                        label = { Text(
+                            text = "Alertas",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 10.sp
+                        )}
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Detalle.ruta,
                         onClick = {navegarAPestana(Rutas.Detalle.ruta)},
                         icon = {Icon(Icons.Filled.Details, contentDescription = "Detalle")},
-                        label = {Text("Detalles")}
+                        label = { Text(
+                            text = "Detalle",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 10.sp
+                        )}
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Login.ruta,
                         onClick = { navegarAPestana(Rutas.Login.ruta) },
                         icon = { Icon(Icons.Filled.Person, contentDescription = "Login") },
-                        label = { Text("Login") }
+                        label = { Text(
+                            text = "Login",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontSize = 10.sp
+                        )}
                     )
                 }
             }
@@ -116,13 +148,33 @@ fun MiNavHost(
         NavHost(
             navController = navController,
             startDestination = Rutas.Inicio.ruta,
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
+            enterTransition = {
+                androidx.compose.animation.fadeIn(animationSpec = androidx.compose.animation.core.tween(300))
+            },
+            exitTransition = {
+                androidx.compose.animation.fadeOut(animationSpec = androidx.compose.animation.core.tween(300))
+            }
         ) {
 
-            composable(Rutas.InicioSesion.ruta) {
+            composable(
+                route = Rutas.InicioSesion.ruta,
+                enterTransition = {
+                    androidx.compose.animation.slideInVertically(
+                        animationSpec = androidx.compose.animation.core.tween(300),
+                        initialOffsetY = { it }
+                    )
+                },
+                exitTransition = {
+                    androidx.compose.animation.slideOutVertically(
+                        animationSpec = androidx.compose.animation.core.tween(300),
+                        targetOffsetY = { it }
+                    )
+                }
+            ) {
                 PantallaInicioSesion(
                     viewModel = loginViewModel,
-                    onLoginExitoso = {navController.popBackStack() },
+                    onLoginExitoso = { navController.popBackStack() },
                     onIrRegistro = { navController.navigate(Rutas.RegistroUsuario.ruta) }
                 )
             }
@@ -132,7 +184,6 @@ fun MiNavHost(
                 )
             }
             composable(Rutas.Inicio.ruta) {
-
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text("Pantalla de Inicio")
                 }
