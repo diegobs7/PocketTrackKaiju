@@ -48,9 +48,9 @@ fun PantallaInicio(navController: NavController) {
                     label = {Text("Inicio")}
                 )
                 NavigationBarItem(
-                    selected = rutaActual == Rutas.Perfil.ruta,
+                    selected = rutaActual == Rutas.Login.ruta,
                     onClick = {
-                        navController.navigate(Rutas.Perfil.ruta) { launchSingleTop = true}
+                        navController.navigate(Rutas.Login.ruta) { launchSingleTop = true}
                     },
                     icon = {Icon(Icons.Filled.Person, contentDescription = "Perfil")},
                     label = {Text("Perfil")}

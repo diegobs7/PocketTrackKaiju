@@ -103,10 +103,10 @@ fun MiNavHost(
                         label = {Text("Detalles")}
                     )
                     NavigationBarItem(
-                        selected = rutaActual == Rutas.Perfil.ruta,
-                        onClick = { navegarAPestana(Rutas.Perfil.ruta) },
-                        icon = { Icon(Icons.Filled.Person, contentDescription = "Perfil") },
-                        label = { Text("Perfil") }
+                        selected = rutaActual == Rutas.Login.ruta,
+                        onClick = { navegarAPestana(Rutas.Login.ruta) },
+                        icon = { Icon(Icons.Filled.Person, contentDescription = "Login") },
+                        label = { Text("Login") }
                     )
                 }
             }
@@ -138,7 +138,7 @@ fun MiNavHost(
                 }
             }
 
-            composable(Rutas.Perfil.ruta) {
+            composable(Rutas.Login.ruta) {
                 PantallaPerfilUsuario(
                     onIrInicioSesion = {navController.navigate(Rutas.InicioSesion.ruta)}
                 )
