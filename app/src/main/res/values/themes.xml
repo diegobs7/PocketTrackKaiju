@@ -2,4 +2,9 @@
 <resources>
 
     <style name="Theme.PocketTrackKaiju_TEA" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.PocketTrackKaiju_TEA.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.PocketTrackKaiju_TEA</item>
+    </style>
 </resources>
