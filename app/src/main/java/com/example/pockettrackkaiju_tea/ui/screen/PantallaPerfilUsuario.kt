@@ -25,7 +25,7 @@ fun PantallaPerfilUsuario(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Perfil", style = MaterialTheme.typography.headlineMedium)
+        Text("Login", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(8.dp))
         Text(
             "Inicia sesion para ver tu informacion",
