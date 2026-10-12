@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddAlert
+import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Moving
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.*
@@ -79,7 +82,25 @@ fun MiNavHost(
                         selected = rutaActual == Rutas.Producto.ruta,
                         onClick = { navegarAPestana(Rutas.Producto.ruta) },
                         icon = { Icon(Icons.Filled.Store, contentDescription = "Productos") },
-                        label = { Text("Productos") }
+                        label = { Text("Catalogo") }
+                    )
+                    NavigationBarItem(
+                        selected = rutaActual == Rutas.Movimiento.ruta,
+                        onClick = {navegarAPestana(Rutas.Movimiento.ruta)},
+                        icon = {Icon(Icons.Filled.Moving, contentDescription = "Movimiento")},
+                        label = {Text("Movimiento")}
+                    )
+                    NavigationBarItem(
+                        selected = rutaActual == Rutas.Alerta.ruta,
+                        onClick = {navegarAPestana(Rutas.Alerta.ruta)},
+                        icon = {Icon(Icons.Filled.AddAlert, contentDescription = "Alerta")},
+                        label = {Text("Alertas")}
+                    )
+                    NavigationBarItem(
+                        selected = rutaActual == Rutas.Detalle.ruta,
+                        onClick = {navegarAPestana(Rutas.Detalle.ruta)},
+                        icon = {Icon(Icons.Filled.Details, contentDescription = "Detalle")},
+                        label = {Text("Detalles")}
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Perfil.ruta,
@@ -105,13 +126,11 @@ fun MiNavHost(
                     onIrRegistro = { navController.navigate(Rutas.RegistroUsuario.ruta) }
                 )
             }
-
             composable(Rutas.RegistroUsuario.ruta) {
                 PantallaRegistroUsuario(
                     onRegistroExitoso = {navController.popBackStack()}
                 )
             }
-
             composable(Rutas.Inicio.ruta) {
 
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -126,7 +145,22 @@ fun MiNavHost(
             }
             composable(Rutas.Producto.ruta) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    Text("Pantalla de Productos en desarrollo")
+                    Text("Pantalla de Catalogo en desarrollo")
+                }
+            }
+            composable(Rutas.Movimiento.ruta) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    Text("Pantalla de Movimiento en desarrollo")
+                }
+            }
+            composable(Rutas.Detalle.ruta) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    Text("Pantalla de Detalle en desarrollo")
+                }
+            }
+            composable(Rutas.Alerta.ruta) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+                    Text("Pantalla de Alertas en desarrollo")
                 }
             }
         }

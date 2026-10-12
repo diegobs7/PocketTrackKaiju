@@ -33,13 +33,13 @@ class RegistroUsuarioViewModel : ViewModel() {
         }
 
         val errorPassword = when {
-            estado.password.isBlank() -> "La contrasena es obligatoria."
-            estado.password.length < 4 -> "La contrasena debe tener minimo 4 caracteres"
+            estado.password.isBlank() -> "La contraseña es obligatoria."
+            estado.password.length < 4 -> "La contraseña debe tener minimo 4 caracteres"
             else -> null
         }
         val errorConfirmarPassword = when {
-            estado.confirmarPassword.isBlank() -> "Confirma tu contrasena."
-            estado.confirmarPassword != estado.password -> "Las contrasenas no coinciden."
+            estado.confirmarPassword.isBlank() -> "Confirma tu contraseña."
+            estado.confirmarPassword != estado.password -> "Las contraseñas no coinciden."
             else -> null
         }
 
@@ -58,7 +58,6 @@ class RegistroUsuarioViewModel : ViewModel() {
     fun registrarUsuario(): Boolean {
         if (!validarFormulario()) return false
 
-        // Sin persistencia por ahora; se limpia el formulario como en el apunte
         _estadoFormulario.value = FormularioRegistroUsuario()
         return true
     }
