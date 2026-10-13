@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +23,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaInicioSesion
 import com.example.pockettrackkaiju_tea.viewmodel.LoginViewModel
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaRegistroUsuario
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,26 +74,53 @@ fun MiNavHost(
                         selected = rutaActual == Rutas.Inicio.ruta,
                         onClick = { navegarAPestana(Rutas.Inicio.ruta) },
                         icon = { Icon(Icons.Filled.Home, contentDescription = "Inicio") },
-                        label = { Text("Inicio")}
+                        label = {
+                            Text(
+                                text = "Inicio",
+                                fontSize = 10.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Catalogo.ruta,
                         onClick = { navegarAPestana(Rutas.Catalogo.ruta) },
                         icon = { Icon(Icons.Filled.Store, contentDescription = "Productos") },
-                        label = { Text("Catalogo")}
+                        label = {
+                            Text(
+                                text = "Catalogo",
+                                fontSize = 10.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Movimiento.ruta,
                         onClick = {navegarAPestana(Rutas.Movimiento.ruta)},
                         icon = {Icon(Icons.Filled.Moving, contentDescription = "Movimiento")},
-                        label = {Text("Movimiento")}
+                        label = {
+                            Text(
+                                text = "Movimiento",
+                                fontSize = 10.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Alerta.ruta,
                         onClick = {navegarAPestana(Rutas.Alerta.ruta)},
                         icon = {Icon(Icons.Filled.AddAlert, contentDescription = "Alerta")},
-                        label = { Text("Alertas")}
-                    )
+                        label = {
+                            Text(
+                                text = "Alertas",
+                                fontSize = 10.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }                    )
                 }
             }
         }
@@ -122,23 +152,35 @@ fun MiNavHost(
             }
             composable(Rutas.Inicio.ruta) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Pantalla de Inicio")
+                    Text(
+                        text = "Pantalla de Inicio en desarrollo",
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
 
             composable(Rutas.Catalogo.ruta) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    Text("Pantalla de Catalogo en desarrollo")
+                    Text(
+                        text = "Pantalla de Catalogo en desarrollo",
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
             composable(Rutas.Movimiento.ruta) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    Text("Pantalla de Movimiento en desarrollo")
+                    Text(
+                        text = "Pantalla de Movimiento en desarrollo",
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
             composable(Rutas.Alerta.ruta) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    Text("Pantalla de Alertas en desarrollo")
+                    Text(
+                        text = "Pantalla de Alertas en desarrollo",
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
