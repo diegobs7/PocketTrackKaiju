@@ -5,7 +5,7 @@ sealed class Rutas(val ruta: String) {
     object RegistroUsuario : Rutas("registro_usuario")
     object Inicio : Rutas("inicio")
     object Login : Rutas("login")
-    object Producto : Rutas("catalogo")
+    object Catalogo : Rutas("catalogo")
     object Movimiento : Rutas("movimiento")
     object Alerta : Rutas("alerta")
     object Detalle : Rutas("detalle")
