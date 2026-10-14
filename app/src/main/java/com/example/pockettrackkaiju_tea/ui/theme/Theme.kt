@@ -9,18 +9,24 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = KaijuColorPrincipal,
-    secondary = KaijuColorSecundario,
-    tertiary = Pink80
+    primary = RosadoKaiju,
+    secondary = MoradoKaiju,
+    background = FondoOscuroKaiju,
+    surface = FondoOscuroKaiju,
+    onPrimary = TextoBlanco
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = KaijuColorPrincipal,
-    secondary = KaijuColorSecundario,
-    background = KaijuColorFondo
+    primary = MoradoKaiju,
+    secondary = RosadoKaiju,
+    tertiary = Color(0XFF03DAC5),
+    background = TextoBlanco,
+    surface = Color(0xFFF5F5F5),
+    onPrimary = TextoBlanco
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

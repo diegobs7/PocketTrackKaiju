@@ -12,6 +12,7 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 //Colores de nuestra aplicaciones, pueden cambiarse dependiendo de los requerimientos del cliente
-val KaijuColorPrincipal = Color(0xFF009688) // Verde azulado
-val KaijuColorSecundario = Color(0xFFFFC107) // Amarillo
-val KaijuColorFondo = Color(0xFFF5F5F5)
+val MoradoKaiju = Color(0xFF6750A4) // Verde azulado
+val RosadoKaiju = Color(0xFFE040FB) // Amarillo
+val FondoOscuroKaiju = Color(0xFF121212)
+val TextoBlanco = Color(0xFFFFFFFF)
