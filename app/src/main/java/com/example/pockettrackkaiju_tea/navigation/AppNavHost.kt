@@ -25,11 +25,14 @@ import com.example.pockettrackkaiju_tea.viewmodel.LoginViewModel
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaRegistroUsuario
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaCatalogo
+import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MiNavHost(
-    loginViewModel: LoginViewModel = viewModel()
+    loginViewModel: LoginViewModel = viewModel(),
+    inventarioViewModel: InventarioViewModel = viewModel()
 ) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -160,12 +163,7 @@ fun MiNavHost(
             }
 
             composable(Rutas.Catalogo.ruta) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    Text(
-                        text = "Pantalla de Catalogo en desarrollo",
-                        textAlign = TextAlign.Center
-                    )
-                }
+                PantallaCatalogo(inventarioViewModel)
             }
             composable(Rutas.Movimiento.ruta) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
