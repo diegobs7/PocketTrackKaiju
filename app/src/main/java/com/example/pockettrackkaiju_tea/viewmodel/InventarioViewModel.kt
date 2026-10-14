@@ -25,4 +25,15 @@ class InventarioViewModel : ViewModel() {
         repositorio.obtenerMovimientos()
             .filter { it.codigoProducto.equals(codigo, ignoreCase = true) }
             .sortedByDescending { it.fecha }
+
+    fun agregarProducto(nuevo: Producto): Boolean {
+        if (nuevo.codigo.isBlank() || buscarProducto(nuevo.codigo) != null) return false
+
+        if (nuevo.precio <= 0 || nuevo.stockMinimo < 0) return false
+
+        repositorio.agregarProducto(nuevo)
+
+        _productos.value = repositorio.obtenerProductos()
+        return true
+    }
 }
