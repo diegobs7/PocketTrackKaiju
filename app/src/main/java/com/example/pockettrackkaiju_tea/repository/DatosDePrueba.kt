@@ -16,7 +16,7 @@ object DatosDePrueba {
 
     val productos = listOf(
         Producto(
-            codigo = "P-1",
+            codigo = "P-001",
             nombre = "Arroz Grado 1 1kg",
             descripcion = "Arroz de grano largo selección especial",
             categoria = "Abarrotes",
@@ -27,7 +27,7 @@ object DatosDePrueba {
             detalle = "Marca Tucapel"
         ),
         Producto(
-            codigo = "P-2",
+            codigo = "P-002",
             nombre = "Aceite Vegetal 1L",
             descripcion = "Aceite vegetal libre de colesterol",
             categoria = "Abarrotes",
@@ -38,7 +38,7 @@ object DatosDePrueba {
             detalle = null
         ),
         Producto(
-            codigo = "P-3",
+            codigo = "P-003",
             nombre = "Leche Entera 1L",
             descripcion = "Leche líquida entera UHT de vaca",
             categoria = "Lácteos",
@@ -49,7 +49,7 @@ object DatosDePrueba {
             detalle = "Mantener refrigerado tras abrir"
         ),
         Producto(
-            codigo = "PROD-4",
+            codigo = "PROD-004",
             nombre = "Detergente Multiuso 3L",
             descripcion = "Detergente líquido concentrado para ropa",
             categoria = "Limpieza",
@@ -60,7 +60,7 @@ object DatosDePrueba {
             detalle = null
         ),
         Producto(
-            codigo = "P-5",
+            codigo = "P-005",
             nombre = "Atún en Lomitos 160g",
             descripcion = "Lomitos de atún en agua",
             categoria = "Enlatados",
@@ -71,7 +71,7 @@ object DatosDePrueba {
             detalle = "Envasado de origen"
         ),
         Producto(
-            codigo = "P-6",
+            codigo = "P-006",
             nombre = "Café Granulado 170g",
             descripcion = "Café instantáneo 100% puro tostado",
             categoria = "Abarrotes",
@@ -130,7 +130,7 @@ object DatosDePrueba {
     val movimientos = listOf(
         Movimiento(
             id = "MOV-1",
-            codigoProducto = "PROD-001",
+            codigoProducto = "P-001",
             tipo = TipoMovimiento.ENTRADA,
             cantidad = 20,
             motivo = "Recepción de mercadería de proveedor",
@@ -139,7 +139,7 @@ object DatosDePrueba {
         ),
         Movimiento(
             id = "MOV-2",
-            codigoProducto = "PROD-002",
+            codigoProducto = "P-002",
             tipo = TipoMovimiento.SALIDA_VENTA,
             cantidad = 5,
             motivo = "Venta Nro. 1042",
@@ -148,7 +148,7 @@ object DatosDePrueba {
         ),
         Movimiento(
             id = "MOV-3",
-            codigoProducto = "PROD-004",
+            codigoProducto = "P-004",
             tipo = TipoMovimiento.SALIDA_CONSUMO,
             cantidad = 1,
             motivo = "Uso interno en limpieza de local",
@@ -157,12 +157,12 @@ object DatosDePrueba {
         ),
         Movimiento(
             id = "MOV-4",
-            codigoProducto = "PROD-007",
+            codigoProducto = "P-007",
             tipo = TipoMovimiento.AJUSTE,
             cantidad = 2,
             motivo = "Ajuste por producto dañado en góndola",
             fecha = "2026-10-04",
-            usuario = vendedor
+            usuario = inv
         )
     )
 }
