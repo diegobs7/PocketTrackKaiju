@@ -27,6 +27,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaCatalogo
 import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
+import androidx.compose.material.icons.filled.Add
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaRegistroProducto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,9 +41,10 @@ fun MiNavHost(
     val backStackEntry by navController.currentBackStackEntryAsState()
     val rutaActual = backStackEntry?.destination?.route
 
-    val rutasSinBarra = listOf(Rutas.InicioSesion.ruta, Rutas.RegistroUsuario.ruta)
+    val rutasSinBarra = listOf(Rutas.InicioSesion.ruta, Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta)
+    val rutasConBotonAtras = listOf(Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta)
+    val mostrarBotonAtras = rutaActual in rutasConBotonAtras
     val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
-    val mostrarBotonAtras = rutaActual == Rutas.RegistroUsuario.ruta
     val navegarAPestana: (String) -> Unit = { ruta ->
         navController.navigate(ruta) {
             popUpTo(Rutas.Inicio.ruta) { saveState = true }
@@ -126,6 +130,15 @@ fun MiNavHost(
                         }                    )
                 }
             }
+        },
+        floatingActionButton = {
+            if (rutaActual == Rutas.Catalogo.ruta) {
+                FloatingActionButton(
+                    onClick = {navController.navigate(Rutas.RegistroProducto.ruta)}
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = "Agregar Producto")
+                }
+            }
         }
     ) { padding ->
 
@@ -180,6 +193,15 @@ fun MiNavHost(
                         textAlign = TextAlign.Center
                     )
                 }
+            }
+            composable(Rutas.RegistroProducto.ruta) {
+                val productos by inventarioViewModel.productos.collectAsStateWithLifecycle()
+
+                PantallaRegistroProducto(
+                    codigosExistentes = productos.map { it.codigo },
+                    onGuardar = {inventarioViewModel.agregarProducto(it)},
+                    onRegistroExitoso = {navController.popBackStack()}
+                )
             }
         }
     }

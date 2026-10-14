@@ -8,7 +8,7 @@ data class Producto (
     val tipo: String,
     val precio: Int,
     val stockActual: Int,
-    val stockMinimo: Int,
+    val stockMinimo: Int = 0,
     val detalle: String?=null
 
 )

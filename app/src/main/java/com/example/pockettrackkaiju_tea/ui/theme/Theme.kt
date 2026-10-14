@@ -1,6 +1,5 @@
 package com.example.pockettrackkaiju_tea.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -14,29 +13,24 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = RosadoKaiju,
+    onPrimary = TextoBlanco,
     secondary = MoradoKaiju,
+    onSecondary = TextoBlanco,
+    tertiary = AmarilloKaiju,
+    onTertiary = Color.Black,
     background = FondoOscuroKaiju,
-    surface = FondoOscuroKaiju,
-    onPrimary = TextoBlanco
+    surface = FondoOscuroKaiju
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = MoradoKaiju,
+    onPrimary = TextoBlanco,
     secondary = RosadoKaiju,
-    tertiary = Color(0XFF03DAC5),
+    onSecondary = TextoBlanco,
+    tertiary = AmarilloKaiju,
+    onTertiary = Color.Black,
     background = TextoBlanco,
-    surface = Color(0xFFF5F5F5),
-    onPrimary = TextoBlanco
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    surface = Color(0xFFF5F5F5)
 )
 
 @Composable
