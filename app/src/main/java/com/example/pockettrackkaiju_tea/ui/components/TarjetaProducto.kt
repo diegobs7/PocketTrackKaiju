@@ -15,7 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.pockettrackkaiju_tea.model.CategoriaProducto
 import com.example.pockettrackkaiju_tea.model.Producto
+import com.example.pockettrackkaiju_tea.model.TipoProducto
 import com.example.pockettrackkaiju_tea.ui.theme.PocketTrackKaiju_TEATheme
 
 @Composable
@@ -66,14 +68,15 @@ private fun formatearPrecio(precio: Int): String =
 @Composable
 fun PreviewTarjetaProducto() {
     val ejemplo = Producto(
-        codigo = "P-001",
-        nombre = "Arroz Grado 1 1kg",
-        descripcion = "",
-        categoria = "Abarrotes",
-        tipo = "Alimento",
-        precio = 1490,
-        stockActual = 25,
-        stockMinimo = 10
+        codigo = "KAI-008",
+        nombre = "Polera Sin Mangas Evangelion",
+        descripcion = "Polera sin mangas ideal para verano, diseño EVA-01",
+        categoria = CategoriaProducto.ANIME,
+        tipo = TipoProducto.POLERA_SIN_MANGAS,
+        precio = 14990,
+        stockActual = 6,
+        stockMinimo = 8,
+        detalle = null
     )
     PocketTrackKaiju_TEATheme {
         Column {

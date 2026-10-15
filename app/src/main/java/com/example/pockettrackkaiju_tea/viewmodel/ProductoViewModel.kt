@@ -1,9 +1,11 @@
 package com.example.pockettrackkaiju_tea.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.example.pockettrackkaiju_tea.model.CategoriaProducto
 import com.example.pockettrackkaiju_tea.model.ErroresProducto
 import com.example.pockettrackkaiju_tea.model.FormularioProducto
 import com.example.pockettrackkaiju_tea.model.Producto
+import com.example.pockettrackkaiju_tea.model.TipoProducto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +38,8 @@ class ProductoViewModel : ViewModel() {
         }
         val errorNombre = if (estado.nombre.isBlank()) "El nombre es obligatorio." else null
         val errorDescripcion = if (estado.descripcion.isBlank()) "La descripcion es obligatoria." else null
+
+        // Validamos que se haya seleccionado algo válido para los Enums
         val errorCategoria = if (estado.categoria.isBlank()) "La categoria es obligatoria." else null
         val errorTipo = if (estado.tipo.isBlank()) "El tipo es obligatorio." else null
 
@@ -70,23 +74,34 @@ class ProductoViewModel : ViewModel() {
                 errorPrecio == null && errorStockActual == null
     }
 
-
     fun crearProducto(codigosExistentes: List<String>): Producto? {
         if (!validarFormulario(codigosExistentes)) return null
 
         val estado = _estadoFormulario.value
+
+        // 1. Buscamos la Categoría seleccionada
+        // Si no se encuentra, usamos OTROS por defecto
+        val categoriaEnum = CategoriaProducto.entries.find { it.displayName == estado.categoria }
+            ?: CategoriaProducto.OTROS
+
+        // 2. Buscamos el Tipo seleccionado
+        // Si no se encuentra, usamos POLERA por defecto (o el primero que tengas)
+        val tipoEnum = TipoProducto.entries.find { it.displayName == estado.tipo }
+            ?: TipoProducto.POLERA
+
         val producto = Producto(
             codigo = estado.codigo.trim(),
             nombre = estado.nombre.trim(),
             descripcion = estado.descripcion.trim(),
-            categoria = estado.categoria.trim(),
-            tipo = estado.tipo.trim(),
+            // 3. Asignamos los objetos Enum en lugar del String
+            categoria = categoriaEnum,
+            tipo = tipoEnum,
             precio = estado.precio.trim().toInt(),
             stockActual = estado.stockActual.trim().toInt(),
             detalle = estado.detalle.trim().ifBlank { null }
         )
 
-        _estadoFormulario.value = FormularioProducto()   // limpia el formulario
+        _estadoFormulario.value = FormularioProducto() // limpia el formulario
         return producto
     }
 }

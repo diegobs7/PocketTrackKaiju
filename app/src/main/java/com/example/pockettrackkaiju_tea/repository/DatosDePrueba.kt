@@ -1,9 +1,11 @@
 package com.example.pockettrackkaiju_tea.repository
 
+import com.example.pockettrackkaiju_tea.model.CategoriaProducto
 import com.example.pockettrackkaiju_tea.model.Movimiento
 import com.example.pockettrackkaiju_tea.model.Producto
 import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.model.TipoMovimiento
+import com.example.pockettrackkaiju_tea.model.TipoProducto
 import com.example.pockettrackkaiju_tea.model.Usuario
 
 object DatosDePrueba {
@@ -16,114 +18,114 @@ object DatosDePrueba {
 
     val productos = listOf(
         Producto(
-            codigo = "P-001",
-            nombre = "Arroz Grado 1 1kg",
-            descripcion = "Arroz de grano largo selección especial",
-            categoria = "Abarrotes",
-            tipo = "Alimento",
-            precio = 1490,
+            codigo = "KAI-001",
+            nombre = "Polera Slam Dunk Shohoku",
+            descripcion = "Polera 100% algodón con diseño de Hanamichi Sakuragi",
+            categoria = CategoriaProducto.ANIME,
+            tipo = TipoProducto.POLERA,
+            precio = 16990,
             stockActual = 25,
             stockMinimo = 10,
-            detalle = "Marca Tucapel"
+            detalle = "Estampado en serigrafía tradicional"
         ),
         Producto(
-            codigo = "P-002",
-            nombre = "Aceite Vegetal 1L",
-            descripcion = "Aceite vegetal libre de colesterol",
-            categoria = "Abarrotes",
-            tipo = "Alimento",
-            precio = 2990,
-            stockActual = 3,
-            stockMinimo = 8,
-            detalle = null
-        ),
-        Producto(
-            codigo = "P-003",
-            nombre = "Leche Entera 1L",
-            descripcion = "Leche líquida entera UHT de vaca",
-            categoria = "Lácteos",
-            tipo = "Perecible",
-            precio = 1150,
-            stockActual = 15,
-            stockMinimo = 10,
-            detalle = "Mantener refrigerado tras abrir"
-        ),
-        Producto(
-            codigo = "PROD-004",
-            nombre = "Detergente Multiuso 3L",
-            descripcion = "Detergente líquido concentrado para ropa",
-            categoria = "Limpieza",
-            tipo = "Insumo",
-            precio = 6990,
-            stockActual = 2,
-            stockMinimo = 5,
-            detalle = null
-        ),
-        Producto(
-            codigo = "P-005",
-            nombre = "Atún en Lomitos 160g",
-            descripcion = "Lomitos de atún en agua",
-            categoria = "Enlatados",
-            tipo = "Alimento",
-            precio = 1290,
-            stockActual = 40,
-            stockMinimo = 15,
-            detalle = "Envasado de origen"
-        ),
-        Producto(
-            codigo = "P-006",
-            nombre = "Café Granulado 170g",
-            descripcion = "Café instantáneo 100% puro tostado",
-            categoria = "Abarrotes",
-            tipo = "Alimento",
-            precio = 4590,
+            codigo = "KAI-002",
+            nombre = "Polerón Canguro Zelda Tears of the Kingdom",
+            descripcion = "Polerón con capucha y bolsillo frontal con logo de Zelda",
+            categoria = CategoriaProducto.VIDEOJUEGOS,
+            tipo = TipoProducto.POLERON_CANGURO,
+            precio = 32990,
             stockActual = 8,
             stockMinimo = 5,
             detalle = null
         ),
         Producto(
-            codigo = "P-007",
-            nombre = "Jabón Líquido 500ml",
-            descripcion = "Jabón para manos con acción antibacterial",
-            categoria = "Higiene",
-            tipo = "Insumo",
-            precio = 2190,
-            stockActual = 4,
-            stockMinimo = 10,
-            detalle = "Aroma a lavanda"
+            codigo = "KAI-003",
+            nombre = "Polera Berserk Guts Armor",
+            descripcion = "Polera negra manga corta con panel del manga de Berserk",
+            categoria = CategoriaProducto.ANIME,
+            tipo = TipoProducto.POLERA,
+            precio = 16990,
+            stockActual = 12,
+            stockMinimo = 5,
+            detalle = "Corte oversize"
         ),
         Producto(
-            codigo = "P-008",
-            nombre = "Pasta Espageti 400g",
-            descripcion = "Fideos de sémola de trigo duro",
-            categoria = "Abarrotes",
-            tipo = "Alimento",
-            precio = 890,
-            stockActual = 30,
-            stockMinimo = 12,
+            codigo = "KAI-004",
+            nombre = "Polera Manga Larga Jujutsu Kaisen",
+            descripcion = "Diseño de Satoru Gojo en técnica de semitono",
+            categoria = CategoriaProducto.ANIME,
+            tipo = TipoProducto.POLERA_MANGA_LARGA,
+            precio = 19990,
+            stockActual = 4,
+            stockMinimo = 5,
             detalle = null
         ),
         Producto(
-            codigo = "P-009",
-            nombre = "Harina Sin Polvos 1kg",
-            descripcion = "Harina de trigo especial para repostería",
-            categoria = "Abarrotes",
-            tipo = "Alimento",
-            precio = 1190,
-            stockActual = 18,
+            codigo = "KAI-005",
+            nombre = "Polera Chrono Trigger Team",
+            descripcion = "Polera clásica con arte original del videojuego de SNES",
+            categoria = CategoriaProducto.VIDEOJUEGOS,
+            tipo = TipoProducto.POLERA,
+            precio = 15990,
+            stockActual = 20,
             stockMinimo = 10,
-            detalle = "Grado 000"
+            detalle = "Edición limitada"
         ),
         Producto(
-            codigo = "P-010",
-            nombre = "Servilletas 200u",
-            descripcion = "Servilletas de papel hoja simple",
-            categoria = "Higiene",
-            tipo = "Insumo",
-            precio = 1590,
+            codigo = "KAI-006",
+            nombre = "Polerón Polo Hunter x Hunter",
+            descripcion = "Polerón cuello redondo con bordado de la licencia de Cazador",
+            categoria = CategoriaProducto.ANIME,
+            tipo = TipoProducto.POLERON_POLO,
+            precio = 28990,
+            stockActual = 15,
+            stockMinimo = 5,
+            detalle = null
+        ),
+        Producto(
+            codigo = "KAI-007",
+            nombre = "Polera Asian Kaiju Oni Mask",
+            descripcion = "Diseño original de máscara Oni estilo japonés",
+            categoria = CategoriaProducto.ASIAN_KAIJU,
+            tipo = TipoProducto.POLERA,
+            precio = 17990,
+            stockActual = 30,
+            stockMinimo = 15,
+            detalle = "Diseño exclusivo de la marca"
+        ),
+        Producto(
+            codigo = "KAI-008",
+            nombre = "Polera Sin Mangas Evangelion",
+            descripcion = "Polera sin mangas ideal para verano, diseño EVA-01",
+            categoria = CategoriaProducto.ANIME,
+            tipo = TipoProducto.POLERA_SIN_MANGAS,
+            precio = 14990,
+            stockActual = 6,
+            stockMinimo = 8,
+            detalle = null
+        ),
+        Producto(
+            codigo = "KAI-009",
+            nombre = "Pack Stickers Pokémon Kanto",
+            descripcion = "Set de 10 stickers de vinilo resistentes al agua",
+            categoria = CategoriaProducto.VIDEOJUEGOS,
+            tipo = TipoProducto.ACCESORIOS,
+            precio = 4990,
             stockActual = 50,
             stockMinimo = 20,
-            detalle = null
+            detalle = "Incluye los iniciales de Kanto"
+        ),
+        Producto(
+            codigo = "KAI-010",
+            nombre = "Polerón Canguro Akira",
+            descripcion = "Polerón rojo icónico con diseño de la píldora de Akira",
+            categoria = CategoriaProducto.ANIME,
+            tipo = TipoProducto.POLERON_CANGURO,
+            precio = 34990,
+            stockActual = 3,
+            stockMinimo = 5,
+            detalle = "Algodón peinado premium"
         )
     )
 
