@@ -1,5 +1,9 @@
 package com.example.pockettrackkaiju_tea.model
 
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 enum class TipoMovimiento {
     ENTRADA,
     SALIDA_VENTA,
@@ -7,16 +11,17 @@ enum class TipoMovimiento {
     AJUSTE
 }
 
+@Entity(tableName = "movimientos")
 data class Movimiento(
-
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val codigoProducto: String,
     val tipo: TipoMovimiento,
     val cantidad: Int,
     val motivo: String,
     val fecha: String,
-    val usuario:Usuario
-
+    @Embedded(prefix = "usuario_")
+    val usuario: Usuario
 )
 
 

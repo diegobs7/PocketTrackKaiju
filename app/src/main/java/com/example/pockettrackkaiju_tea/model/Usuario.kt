@@ -1,5 +1,8 @@
 package com.example.pockettrackkaiju_tea.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 enum class Rol{
     ADMINISTRADOR,
     VENDEDOR,
@@ -7,8 +10,10 @@ enum class Rol{
 
 }
 
+@Entity(tableName = "usuarios")
 data class Usuario(
-    val id:String,
-    val nombre:String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val nombre: String,
     val rol: Rol
 )

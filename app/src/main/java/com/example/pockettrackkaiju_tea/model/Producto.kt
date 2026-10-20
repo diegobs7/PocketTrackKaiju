@@ -1,5 +1,8 @@
 package com.example.pockettrackkaiju_tea.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 enum class CategoriaProducto(val displayName: String) {
     ANIME("Anime / Manga"),
     VIDEOJUEGOS("Videojuegos"),
@@ -18,15 +21,17 @@ enum class TipoProducto(val displayName: String) {
     CHAQUETA("Chaqueta"),
     ACCESORIOS("Accesorios (Tazones, Stickers, etc)")
 }
-data class Producto (
+@Entity(tableName = "productos")
+data class Producto(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val codigo: String,
-    val nombre : String,
-    val descripcion:String,
+    val nombre: String,
+    val descripcion: String,
     val categoria: CategoriaProducto,
     val tipo: TipoProducto,
     val precio: Int,
     val stockActual: Int,
-    val stockMinimo: Int = 0,
-    val detalle: String?=null
-
+    val stockMinimo: Int = 5,
+    val detalle: String? = null
 )
