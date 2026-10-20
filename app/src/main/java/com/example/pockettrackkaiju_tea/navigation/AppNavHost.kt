@@ -28,14 +28,16 @@ import androidx.compose.ui.unit.sp
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaCatalogo
 import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 import androidx.compose.material.icons.filled.Add
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.platform.LocalContext
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaMovimiento
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaRegistroProducto
+import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MiNavHost(
     loginViewModel: LoginViewModel = viewModel(),
-    inventarioViewModel: InventarioViewModel = viewModel()
+    inventarioViewModel: InventarioViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
 ) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -179,12 +181,7 @@ fun MiNavHost(
                 PantallaCatalogo(inventarioViewModel)
             }
             composable(Rutas.Movimiento.ruta) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    Text(
-                        text = "Pantalla de Movimiento en desarrollo",
-                        textAlign = TextAlign.Center
-                    )
-                }
+                PantallaMovimiento()
             }
             composable(Rutas.Alerta.ruta) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
@@ -195,12 +192,8 @@ fun MiNavHost(
                 }
             }
             composable(Rutas.RegistroProducto.ruta) {
-                val productos by inventarioViewModel.productos.collectAsStateWithLifecycle()
-
                 PantallaRegistroProducto(
-                    codigosExistentes = productos.map { it.codigo },
-                    onGuardar = {inventarioViewModel.agregarProducto(it)},
-                    onRegistroExitoso = {navController.popBackStack()}
+                    onRegistroExitoso = { navController.popBackStack() }
                 )
             }
         }

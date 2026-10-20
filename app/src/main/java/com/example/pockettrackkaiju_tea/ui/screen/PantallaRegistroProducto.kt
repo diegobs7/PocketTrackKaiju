@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,8 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.model.CategoriaProducto
-import com.example.pockettrackkaiju_tea.model.Producto
 import com.example.pockettrackkaiju_tea.model.TipoProducto
+import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.ProductoViewModel
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
@@ -51,9 +52,7 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaRegistroProducto(
-    viewModel: ProductoViewModel = viewModel(),
-    codigosExistentes: List<String>,
-    onGuardar: (Producto) -> Unit,
+    viewModel: ProductoViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
     onRegistroExitoso: () -> Unit = {}
 ) {
     val estado by viewModel.estadoFormulario.collectAsStateWithLifecycle()
@@ -64,8 +63,7 @@ fun PantallaRegistroProducto(
     var mostrarMensajeExito by remember { mutableStateOf(false) }
 
     val intentarRegistrar: () -> Unit = {
-        viewModel.crearProducto(codigosExistentes)?.let { producto ->
-            onGuardar(producto)
+        if (viewModel.crearProducto()) {
             mostrarMensajeExito = true
         }
     }

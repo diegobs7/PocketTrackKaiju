@@ -1,39 +1,32 @@
 package com.example.pockettrackkaiju_tea.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.pockettrackkaiju_tea.model.Movimiento
 import com.example.pockettrackkaiju_tea.model.Producto
-import com.example.pockettrackkaiju_tea.repository.InventarioRepository
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.pockettrackkaiju_tea.repository.MovimientoRepository
+import com.example.pockettrackkaiju_tea.repository.ProductoRepository
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 
-class InventarioViewModel : ViewModel() {
+class InventarioViewModel(
+    productoRepository: ProductoRepository,
+    movimientoRepository: MovimientoRepository
+) : ViewModel() {
 
-    private val repositorio = InventarioRepository()
+    val productos: StateFlow<List<Producto>> = productoRepository.productos
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    private val _productos = MutableStateFlow(repositorio.obtenerProductos())
-    val productos: StateFlow<List<Producto>> = _productos.asStateFlow()
+    private val movimientos: StateFlow<List<Movimiento>> = movimientoRepository.movimientos
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun buscarProducto(codigo: String): Producto? =
-        _productos.value.find { it.codigo.equals(codigo, ignoreCase = true) }
+        productos.value.find { it.codigo.equals(codigo, ignoreCase = true) }
 
     fun estaEnAlerta(producto: Producto): Boolean =
         producto.stockActual <= producto.stockMinimo
 
     fun movimientosDe(codigo: String): List<Movimiento> =
-        repositorio.obtenerMovimientos()
-            .filter { it.codigoProducto.equals(codigo, ignoreCase = true) }
-            .sortedByDescending { it.fecha }
-
-    fun agregarProducto(nuevo: Producto): Boolean {
-        if (nuevo.codigo.isBlank() || buscarProducto(nuevo.codigo) != null) return false
-
-        if (nuevo.precio <= 0 || nuevo.stockMinimo < 0) return false
-
-        repositorio.agregarProducto(nuevo)
-
-        _productos.value = repositorio.obtenerProductos()
-        return true
-    }
+        movimientos.value.filter { it.codigoProducto.equals(codigo, ignoreCase = true) }
 }
