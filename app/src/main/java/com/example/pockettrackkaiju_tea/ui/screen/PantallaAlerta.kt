@@ -1,0 +1,53 @@
+package com.example.pockettrackkaiju_tea.ui.screen
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pockettrackkaiju_tea.ui.components.TarjetaAlerta
+import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
+
+@Composable
+fun PantallaAlertas(viewModel: InventarioViewModel) {
+    val productos by viewModel.productos.collectAsStateWithLifecycle()
+
+    val enAlerta = productos
+        .filter { viewModel.estaEnAlerta(it) }
+        .sortedBy { it.stockActual }
+
+    if (enAlerta.isEmpty()) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = "Todo en orden: no hay productos con stock bajo.",
+                textAlign = TextAlign.Center
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            item {
+                Text(
+                    text = "Productos por reponer: ${enAlerta.size}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            items(enAlerta, key = { it.id }) { producto ->
+                TarjetaAlerta(producto)
+            }
+        }
+    }
+}

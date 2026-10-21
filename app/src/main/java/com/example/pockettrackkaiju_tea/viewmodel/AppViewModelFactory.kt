@@ -23,6 +23,8 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
             InventarioViewModel(productoRepository, movimientoRepository)
         modelClass.isAssignableFrom(MovimientoViewModel::class.java) ->
             MovimientoViewModel(productoRepository, movimientoRepository, usuarioRepository)
+        modelClass.isAssignableFrom(RegistroUsuarioViewModel::class.java) ->
+            RegistroUsuarioViewModel(usuarioRepository)
         else -> throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
     } as T
 }

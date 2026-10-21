@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 class MovimientoViewModel(
     private val productoRepository: ProductoRepository,
@@ -100,7 +101,7 @@ class MovimientoViewModel(
             cantidad = cantidad,
             motivo = estado.motivo.trim(),
             fecha = fechaActual(),
-            usuario = responsable
+            responsable = responsable.nombre
         )
 
         viewModelScope.launch {
@@ -129,5 +130,8 @@ class MovimientoViewModel(
     }
 
     private fun fechaActual(): String =
-        SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(Date())
+        SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).apply {
+            timeZone = TimeZone.getTimeZone("America/Santiago")
+        }.format(Date())
+
 }

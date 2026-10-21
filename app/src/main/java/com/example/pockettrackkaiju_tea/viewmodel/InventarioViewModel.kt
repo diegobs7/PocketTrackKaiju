@@ -18,7 +18,7 @@ class InventarioViewModel(
     val productos: StateFlow<List<Producto>> = productoRepository.productos
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    private val movimientos: StateFlow<List<Movimiento>> = movimientoRepository.movimientos
+    val movimientos: StateFlow<List<Movimiento>> = movimientoRepository.movimientos
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     fun buscarProducto(codigo: String): Producto? =
