@@ -7,15 +7,16 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.pockettrackkaiju_tea.model.Usuario
 import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 
 @Composable
-fun PantallaMovimientos(inventarioViewModel: InventarioViewModel) {
-    var pestanaSeleccionada by remember { mutableStateOf(0) }
+fun PantallaMovimientos(inventarioViewModel: InventarioViewModel, usuario: Usuario) {
+    var pestanaSeleccionada by remember { mutableIntStateOf(0) }
     val titulos = listOf("Registrar", "Historial")
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -30,7 +31,7 @@ fun PantallaMovimientos(inventarioViewModel: InventarioViewModel) {
         }
 
         when (pestanaSeleccionada) {
-            0 -> PantallaMovimiento()
+            0 -> PantallaMovimiento(usuario)
             else -> PantallaHistorialMovimientos(inventarioViewModel)
         }
     }

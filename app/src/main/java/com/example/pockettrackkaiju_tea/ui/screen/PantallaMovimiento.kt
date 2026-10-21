@@ -43,6 +43,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.model.TipoMovimiento
 import com.example.pockettrackkaiju_tea.model.Usuario
+import com.example.pockettrackkaiju_tea.model.tiposDeMovimientoPermitidos
+import com.example.pockettrackkaiju_tea.ui.components.etiquetaRol
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.MovimientoViewModel
 import kotlinx.coroutines.delay
@@ -51,20 +53,19 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaMovimiento(
+    usuario: Usuario,
     viewModel: MovimientoViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
 ) {
     val estado by viewModel.estadoFormulario.collectAsStateWithLifecycle()
     val productos by viewModel.productos.collectAsStateWithLifecycle()
-    val usuarios by viewModel.usuarios.collectAsStateWithLifecycle()
 
     var menuProductoExpandido by remember { mutableStateOf(false) }
     var menuTipoExpandido by remember { mutableStateOf(false) }
-    var menuResponsableExpandido by remember { mutableStateOf(false) }
 
     var mostrarMensajeExito by remember { mutableStateOf(false) }
 
     val intentarRegistrar: () -> Unit = {
-        if (viewModel.registrarMovimiento()) {
+        if (viewModel.registrarMovimiento(usuario)) {
             mostrarMensajeExito = true
         }
     }
@@ -90,7 +91,7 @@ fun PantallaMovimiento(
             )
             Spacer(Modifier.height(8.dp))
 
-            // Producto
+
             ExposedDropdownMenuBox(
                 expanded = menuProductoExpandido,
                 onExpandedChange = { menuProductoExpandido = !menuProductoExpandido },
@@ -132,7 +133,7 @@ fun PantallaMovimiento(
                 }
             }
 
-            // Tipo de movimiento
+
             ExposedDropdownMenuBox(
                 expanded = menuTipoExpandido,
                 onExpandedChange = { menuTipoExpandido = !menuTipoExpandido },
@@ -158,7 +159,7 @@ fun PantallaMovimiento(
                     expanded = menuTipoExpandido,
                     onDismissRequest = { menuTipoExpandido = false }
                 ) {
-                    TipoMovimiento.entries.forEach { tipo ->
+                    usuario.rol.tiposDeMovimientoPermitidos().forEach { tipo ->
                         DropdownMenuItem(
                             text = { Text(etiquetaTipo(tipo)) },
                             onClick = {
@@ -169,7 +170,6 @@ fun PantallaMovimiento(
                     }
                 }
             }
-
 
             OutlinedTextField(
                 value = estado.cantidad,
@@ -200,43 +200,13 @@ fun PantallaMovimiento(
                 modifier = Modifier.fillMaxWidth()
             )
 
-
-            ExposedDropdownMenuBox(
-                expanded = menuResponsableExpandido,
-                onExpandedChange = { menuResponsableExpandido = !menuResponsableExpandido },
+            OutlinedTextField(
+                value = "${usuario.nombre} (${etiquetaRol(usuario.rol)})",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Responsable") },
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = estado.responsable?.let { etiquetaUsuario(it) } ?: "",
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Responsable") },
-                    isError = estado.errores.errorResponsable != null,
-                    supportingText = { estado.errores.errorResponsable?.let { Text(it) } },
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuResponsableExpandido)
-                    },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                    modifier = Modifier
-                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                        .fillMaxWidth()
-                )
-
-                ExposedDropdownMenu(
-                    expanded = menuResponsableExpandido,
-                    onDismissRequest = { menuResponsableExpandido = false }
-                ) {
-                    usuarios.forEach { usuario ->
-                        DropdownMenuItem(
-                            text = { Text(etiquetaUsuario(usuario)) },
-                            onClick = {
-                                viewModel.seleccionarResponsable(usuario)
-                                menuResponsableExpandido = false
-                            }
-                        )
-                    }
-                }
-            }
+            )
 
             Spacer(Modifier.height(8.dp))
 
@@ -290,6 +260,3 @@ fun etiquetaTipo(tipo: TipoMovimiento): String = when (tipo) {
     TipoMovimiento.SALIDA_CONSUMO -> "Salida por consumo"
     TipoMovimiento.AJUSTE -> "Ajuste"
 }
-
-private fun etiquetaUsuario(usuario: Usuario): String =
-    "${usuario.nombre} (${usuario.rol.name.replace("_", " ").lowercase()})"

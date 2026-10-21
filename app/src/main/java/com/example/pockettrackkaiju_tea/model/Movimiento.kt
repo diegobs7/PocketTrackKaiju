@@ -19,7 +19,8 @@ data class Movimiento(
     val cantidad: Int,
     val motivo: String,
     val fecha: String,
-    val responsable: String
+    val responsable: String,
+    val responsableId: Int
 )
 
 

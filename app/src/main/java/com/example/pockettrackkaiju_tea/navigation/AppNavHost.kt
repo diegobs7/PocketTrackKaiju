@@ -1,9 +1,12 @@
 package com.example.pockettrackkaiju_tea.navigation
 
-
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddAlert
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Moving
@@ -11,41 +14,65 @@ import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.pockettrackkaiju_tea.ui.screen.PantallaInicioSesion
-import com.example.pockettrackkaiju_tea.viewmodel.LoginViewModel
-import com.example.pockettrackkaiju_tea.ui.screen.PantallaRegistroUsuario
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
-import com.example.pockettrackkaiju_tea.ui.screen.PantallaCatalogo
-import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.ui.platform.LocalContext
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaAlertas
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaCatalogo
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaInicio
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaInicioSesion
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaMovimientos
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaRegistroProducto
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaRegistroUsuario
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
+import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
+import com.example.pockettrackkaiju_tea.viewmodel.LoginViewModel
+import com.example.pockettrackkaiju_tea.viewmodel.SesionViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pockettrackkaiju_tea.model.puedeAgregarProductos
+import com.example.pockettrackkaiju_tea.model.puedeVerAlertas
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MiNavHost(
-    loginViewModel: LoginViewModel = viewModel(),
+    loginViewModel: LoginViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
+    sesionViewModel: SesionViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
     inventarioViewModel: InventarioViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
 ) {
+    val cargando by sesionViewModel.cargando.collectAsStateWithLifecycle()
+    if (cargando) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val rutaActual = backStackEntry?.destination?.route
+    val usuario by sesionViewModel.usuarioActual.collectAsStateWithLifecycle()
+    val rol = usuario?.rol
+    val destinoInicial = remember {
+        if (sesionViewModel.usuarioActual.value != null) Rutas.Inicio.ruta else Rutas.InicioSesion.ruta
+    }
 
     val rutasSinBarra = listOf(Rutas.InicioSesion.ruta, Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta)
     val rutasConBotonAtras = listOf(Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta)
     val mostrarBotonAtras = rutaActual in rutasConBotonAtras
     val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
+
+
+    var mostrarDialogoSalir by remember { mutableStateOf(false) }
+
     val navegarAPestana: (String) -> Unit = { ruta ->
         navController.navigate(ruta) {
             popUpTo(Rutas.Inicio.ruta) { saveState = true }
@@ -54,16 +81,53 @@ fun MiNavHost(
         }
     }
 
+
+    if (mostrarDialogoSalir) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoSalir = false },
+            title = { Text("Cerrar sesión") },
+            text = { Text("¿Estás seguro de que deseas salir de tu cuenta?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        mostrarDialogoSalir = false // Ocultamos el diálogo
+                        sesionViewModel.cerrarSesion() // Limpiamos los datos
+                        navController.navigate(Rutas.InicioSesion.ruta) {
+                            popUpTo(0) { inclusive = true } // Destruimos el historial
+                        }
+                    }
+                ) {
+                    Text("Sí, salir", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { mostrarDialogoSalir = false } // Solo ocultamos el diálogo
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {Text("PocketTrack Kaiju")},
+                title = { Text("PocketTrack Kaiju") },
                 navigationIcon = {
                     if (mostrarBotonAtras) {
-                        IconButton(onClick = {navController.popBackStack()}) {
+                        IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Volver"
+                            )
+                        }
+                    } else if (mostrarBarraInferior) {
+                        // Al presionar el botón, cambiamos el estado a 'true' para mostrar el diálogo
+                        IconButton(onClick = { mostrarDialogoSalir = true }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Cerrar sesión"
                             )
                         }
                     }
@@ -106,8 +170,8 @@ fun MiNavHost(
                     )
                     NavigationBarItem(
                         selected = rutaActual == Rutas.Movimiento.ruta,
-                        onClick = {navegarAPestana(Rutas.Movimiento.ruta)},
-                        icon = {Icon(Icons.Filled.Moving, contentDescription = "Movimiento")},
+                        onClick = { navegarAPestana(Rutas.Movimiento.ruta) },
+                        icon = { Icon(Icons.Filled.Moving, contentDescription = "Movimiento") },
                         label = {
                             Text(
                                 text = "Movimiento",
@@ -117,25 +181,28 @@ fun MiNavHost(
                             )
                         }
                     )
-                    NavigationBarItem(
-                        selected = rutaActual == Rutas.Alerta.ruta,
-                        onClick = {navegarAPestana(Rutas.Alerta.ruta)},
-                        icon = {Icon(Icons.Filled.AddAlert, contentDescription = "Alerta")},
-                        label = {
-                            Text(
-                                text = "Alertas",
-                                fontSize = 10.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }                    )
+                    if(rol?.puedeVerAlertas() == true) {
+                        NavigationBarItem(
+                            selected = rutaActual == Rutas.Alerta.ruta,
+                            onClick = { navegarAPestana(Rutas.Alerta.ruta) },
+                            icon = { Icon(Icons.Filled.AddAlert, contentDescription = "Alerta") },
+                            label = {
+                                Text(
+                                    text = "Alertas",
+                                    fontSize = 10.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        )
+                    }
                 }
             }
         },
         floatingActionButton = {
-            if (rutaActual == Rutas.Catalogo.ruta) {
+            if (rutaActual == Rutas.Catalogo.ruta && rol?.puedeAgregarProductos() == true) {
                 FloatingActionButton(
-                    onClick = {navController.navigate(Rutas.RegistroProducto.ruta)}
+                    onClick = { navController.navigate(Rutas.RegistroProducto.ruta) }
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "Agregar Producto")
                 }
@@ -145,16 +212,14 @@ fun MiNavHost(
 
         NavHost(
             navController = navController,
-            startDestination = Rutas.InicioSesion.ruta,
+            startDestination = destinoInicial,
             modifier = Modifier.padding(padding),
         ) {
-
-            composable(
-                route = Rutas.InicioSesion.ruta
-            ) {
+            composable(route = Rutas.InicioSesion.ruta) {
                 PantallaInicioSesion(
                     viewModel = loginViewModel,
-                    onLoginExitoso = {
+                    onLoginExitoso = { usuarioLogueado, recordar ->
+                        sesionViewModel.iniciarSesion(usuarioLogueado, recordar)
                         navController.navigate(Rutas.Inicio.ruta) {
                             popUpTo(Rutas.InicioSesion.ruta) { inclusive = true }
                         }
@@ -164,17 +229,17 @@ fun MiNavHost(
             }
             composable(Rutas.RegistroUsuario.ruta) {
                 PantallaRegistroUsuario(
-                    onRegistroExitoso = {navController.popBackStack()}
+                    onRegistroExitoso = { navController.popBackStack() }
                 )
             }
             composable(Rutas.Inicio.ruta) {
-                PantallaInicio(inventarioViewModel)
+                usuario?.let { PantallaInicio(inventarioViewModel, it) }
             }
             composable(Rutas.Catalogo.ruta) {
                 PantallaCatalogo(inventarioViewModel)
             }
             composable(Rutas.Movimiento.ruta) {
-                PantallaMovimientos(inventarioViewModel)
+                usuario?.let { PantallaMovimientos(inventarioViewModel, it) }
             }
             composable(Rutas.Alerta.ruta) {
                 PantallaAlertas(inventarioViewModel)
