@@ -14,12 +14,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pockettrackkaiju_tea.model.Usuario
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaMovimiento
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaResumen
+import com.example.pockettrackkaiju_tea.ui.components.etiquetaRol
 import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 
 @Composable
-fun PantallaInicio(viewModel: InventarioViewModel) {
+fun PantallaInicio(viewModel: InventarioViewModel, usuario: Usuario) {
     val productos by viewModel.productos.collectAsStateWithLifecycle()
     val movimientos by viewModel.movimientos.collectAsStateWithLifecycle()
 
@@ -33,8 +35,12 @@ fun PantallaInicio(viewModel: InventarioViewModel) {
     ) {
         item {
             Text(
-                text = "Resumen del inventario",
+                text = "Hola, ${usuario.nombre}",
                 style = MaterialTheme.typography.headlineSmall
+            )
+            Text(
+                text = etiquetaRol(usuario.rol),
+                style = MaterialTheme.typography.bodyMedium
             )
         }
 

@@ -7,10 +7,13 @@ import com.example.pockettrackkaiju_tea.database.AppDatabase
 import com.example.pockettrackkaiju_tea.repository.MovimientoRepository
 import com.example.pockettrackkaiju_tea.repository.ProductoRepository
 import com.example.pockettrackkaiju_tea.repository.UsuarioRepository
+import com.example.pockettrackkaiju_tea.util.SesionGuardada
 
 class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
 
-    private val database = AppDatabase.getInstance(contexto)
+    private val appContext = contexto.applicationContext
+
+    private val database = AppDatabase.getInstance(appContext)
     private val productoRepository = ProductoRepository(database.productoDao())
     private val movimientoRepository = MovimientoRepository(database.movimientoDao())
     private val usuarioRepository = UsuarioRepository(database.usuarioDao())
@@ -19,12 +22,21 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when {
         modelClass.isAssignableFrom(ProductoViewModel::class.java) ->
             ProductoViewModel(productoRepository)
+
         modelClass.isAssignableFrom(InventarioViewModel::class.java) ->
             InventarioViewModel(productoRepository, movimientoRepository)
+
         modelClass.isAssignableFrom(MovimientoViewModel::class.java) ->
-            MovimientoViewModel(productoRepository, movimientoRepository, usuarioRepository)
+            MovimientoViewModel(productoRepository, movimientoRepository)
+
         modelClass.isAssignableFrom(RegistroUsuarioViewModel::class.java) ->
             RegistroUsuarioViewModel(usuarioRepository)
+
+        modelClass.isAssignableFrom(LoginViewModel::class.java) ->
+            LoginViewModel(usuarioRepository)
+
+        modelClass.isAssignableFrom(SesionViewModel::class.java) ->
+            SesionViewModel(usuarioRepository, SesionGuardada(appContext))
         else -> throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
     } as T
 }

@@ -19,6 +19,8 @@ class UsuarioRepository(private val dao: UsuarioDao) {
     suspend fun autenticar(correo: String, contra: String): Usuario? =
         dao.autenticar(correo.trim().lowercase(), contra)
 
+    suspend fun obtenerPorId(id: Int): Usuario? = dao.obtenerPorId(id)
+
     suspend fun cargarUsuariosDePrueba() {
         if (dao.contar() > 0) return
         dao.insertar(Usuario(nombre = "Thomas Araya", correo = "thomas@kaiju.cl", contra = "1234", rol = Rol.VENDEDOR))

@@ -25,4 +25,6 @@ interface UsuarioDao {
 
     @Query("SELECT * FROM usuarios WHERE correo = :correo AND contra = :contra")
     suspend fun autenticar(correo: String, contra: String): Usuario?
+    @Query("SELECT * FROM usuarios WHERE id = :id")
+    suspend fun obtenerPorId(id: Int): Usuario?
 }
