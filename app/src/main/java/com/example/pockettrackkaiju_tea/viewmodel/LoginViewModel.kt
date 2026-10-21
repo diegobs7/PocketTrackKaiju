@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-// Agregamos el repositorio al constructor
+
 class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
     private val _estadoFormulario = MutableStateFlow(FormularioLogin())
     val estadoFormulario: StateFlow<FormularioLogin> = _estadoFormulario.asStateFlow()
 
     init {
-        // Carga los usuarios de prueba si la tabla está vacía
+
         viewModelScope.launch { repository.cargarUsuariosDePrueba() }
     }
 

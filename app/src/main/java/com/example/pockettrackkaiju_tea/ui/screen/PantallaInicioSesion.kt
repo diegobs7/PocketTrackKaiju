@@ -89,7 +89,6 @@ fun PantallaInicioSesion(
         Text("Iniciar sesión", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(32.dp))
 
-        // DISEÑO 1: Banner superior de Error General (Credenciales incorrectas)
         if (esErrorCredenciales) {
             Surface(
                 color = MaterialTheme.colorScheme.errorContainer,
@@ -127,7 +126,7 @@ fun PantallaInicioSesion(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        // DISEÑO 2: Error de formato de correo con ícono
+
         if (errorEmail != null) {
             MensajeErrorConIcono(errorEmail)
         }
@@ -146,7 +145,7 @@ fun PantallaInicioSesion(
             modifier = Modifier.fillMaxWidth()
         )
 
-        // DISEÑO 2: Error de formato de contraseña con ícono (Oculto si el banner está activo)
+
         if (errorPassword != null && !esErrorCredenciales) {
             MensajeErrorConIcono(errorPassword)
         }
