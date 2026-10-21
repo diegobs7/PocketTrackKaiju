@@ -24,7 +24,7 @@ import com.example.pockettrackkaiju_tea.ui.theme.PocketTrackKaiju_TEATheme
 fun TarjetaProducto(
     producto: Producto,
     enAlerta: Boolean,
-    onClick: () -> Unit = {} // se conectará al detalle (RF04) más adelante
+    onClick: () -> Unit = {}
 ) {
     Card(
         onClick = onClick,
@@ -60,11 +60,10 @@ fun TarjetaProducto(
     }
 }
 
-// 1490 -> "$1.490" (pesos chilenos, sin decimales)
+
 private fun formatearPrecio(precio: Int): String =
     "$" + "%,d".format(precio).replace(',', '.')
 
-@Preview(showBackground = true)
 @Composable
 fun PreviewTarjetaProducto() {
     val ejemplo = Producto(

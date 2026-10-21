@@ -90,10 +90,10 @@ fun MiNavHost(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        mostrarDialogoSalir = false // Ocultamos el diálogo
-                        sesionViewModel.cerrarSesion() // Limpiamos los datos
+                        mostrarDialogoSalir = false
+                        sesionViewModel.cerrarSesion()
                         navController.navigate(Rutas.InicioSesion.ruta) {
-                            popUpTo(0) { inclusive = true } // Destruimos el historial
+                            popUpTo(0) { inclusive = true }
                         }
                     }
                 ) {
@@ -102,7 +102,7 @@ fun MiNavHost(
             },
             dismissButton = {
                 TextButton(
-                    onClick = { mostrarDialogoSalir = false } // Solo ocultamos el diálogo
+                    onClick = { mostrarDialogoSalir = false }
                 ) {
                     Text("Cancelar")
                 }
@@ -123,7 +123,7 @@ fun MiNavHost(
                             )
                         }
                     } else if (mostrarBarraInferior) {
-                        // Al presionar el botón, cambiamos el estado a 'true' para mostrar el diálogo
+
                         IconButton(onClick = { mostrarDialogoSalir = true }) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ExitToApp,

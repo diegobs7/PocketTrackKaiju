@@ -42,7 +42,7 @@ fun IndicadorStock(
         ) {
             Icon(
                 imageVector = if (enAlerta) Icons.Filled.Warning else Icons.Filled.CheckCircle,
-                contentDescription = null, // el texto de al lado ya lo dice
+                contentDescription = null,
                 tint = colorIcono,
                 modifier = Modifier.size(16.dp)
             )

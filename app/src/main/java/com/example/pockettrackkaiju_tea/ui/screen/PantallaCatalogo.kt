@@ -49,7 +49,7 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
     var categoriaSeleccionada by remember { mutableStateOf<CategoriaProducto?>(null) }
     var busquedaExpandida by remember { mutableStateOf(false) }
 
-    // Estado para el menú desplegable de categorías
+
     var menuCategoriaExpandido by remember { mutableStateOf(false) }
 
     val productosFiltrados = productos.filter { producto ->
@@ -65,7 +65,7 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
 
         Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
 
-            // --- BARRA DE BÚSQUEDA EXPANSIBLE ---
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -96,7 +96,7 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
                         singleLine = true
                     )
                 } else {
-                    // Box para centrar el título mientras se empuja el ícono a la derecha
+
                     Box(modifier = Modifier.fillMaxWidth()) {
                         Text(
                             text = "Catálogo",
@@ -115,16 +115,16 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // --- FILTRO POR CATEGORÍAS (Menú Desplegable) ---
+
             ExposedDropdownMenuBox(
                 expanded = menuCategoriaExpandido,
                 onExpandedChange = { menuCategoriaExpandido = !menuCategoriaExpandido },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    // Mostramos "Todas las categorías" si es nulo, o el nombre de la categoría seleccionada
+
                     value = categoriaSeleccionada?.displayName ?: "Todas las categorías",
-                    onValueChange = {}, // Solo lectura
+                    onValueChange = {},
                     readOnly = true,
                     label = { Text("Filtrar por categoría") },
                     trailingIcon = {
@@ -140,7 +140,7 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
                     expanded = menuCategoriaExpandido,
                     onDismissRequest = { menuCategoriaExpandido = false }
                 ) {
-                    // Opción para ver todo
+
                     DropdownMenuItem(
                         text = { Text("Todas las categorías") },
                         onClick = {
@@ -149,7 +149,7 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
                         }
                     )
 
-                    // Opciones del Enum
+
                     CategoriaProducto.entries.forEach { categoria ->
                         DropdownMenuItem(
                             text = { Text(categoria.displayName) },
@@ -165,7 +165,7 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // --- LISTA DE PRODUCTOS ---
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),

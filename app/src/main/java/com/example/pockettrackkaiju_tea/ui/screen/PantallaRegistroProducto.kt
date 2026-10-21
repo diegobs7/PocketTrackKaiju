@@ -300,7 +300,7 @@ fun PantallaRegistroProducto(
 
     if (mostrarMensajeExito) {
         LaunchedEffect(Unit) {
-            delay(2.seconds) // 2 segundos
+            delay(2.seconds)
             mostrarMensajeExito = false
             onRegistroExitoso()
         }
