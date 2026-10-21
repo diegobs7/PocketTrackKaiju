@@ -227,6 +227,24 @@ fun PantallaRegistroProducto(
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
+            OutlinedTextField(
+                value = estado.stockMinimo,
+                onValueChange = viewModel::actualizarStockMinimo,
+                label = { Text("Stock mínimo") },
+                isError = estado.errores.errorStockMinimo != null,
+                supportingText = {
+                    Text(
+                        estado.errores.errorStockMinimo
+                            ?: "Se mostrará una alerta cuando el stock llegue a este número."
+                    )
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                ),
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             OutlinedTextField(
                 value = estado.detalle,

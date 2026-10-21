@@ -8,6 +8,7 @@ data class FormularioProducto(
     val tipo: String = "",
     val precio: String = "",
     val stockActual: String = "",
+    val stockMinimo: String = "",
     val detalle: String = "",
     val errores: ErroresProducto = ErroresProducto()
 

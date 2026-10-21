@@ -23,7 +23,6 @@ class ProductoViewModel(
     private val _estadoFormulario = MutableStateFlow(FormularioProducto())
     val estadoFormulario: StateFlow<FormularioProducto> = _estadoFormulario.asStateFlow()
 
-    // Los productos guardados, para revisar que el código no se repita
     private val productos: StateFlow<List<Producto>> = repository.productos
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -35,12 +34,14 @@ class ProductoViewModel(
     fun actualizarPrecio(valor: String) = _estadoFormulario.update { it.copy(precio = valor) }
     fun actualizarStockActual(valor: String) = _estadoFormulario.update { it.copy(stockActual = valor) }
     fun actualizarDetalle(valor: String) = _estadoFormulario.update { it.copy(detalle = valor) }
+    fun actualizarStockMinimo(valor: String) = _estadoFormulario.update { it.copy(stockMinimo = valor) }
 
     fun validarFormulario(): Boolean {
         val estado = _estadoFormulario.value
         val codigosExistentes = productos.value.map { it.codigo }
         val precioNumerico = estado.precio.trim().toIntOrNull()
         val stockNumerico = estado.stockActual.trim().toIntOrNull()
+        val stockMinimoNumerico = estado.stockMinimo.trim().toIntOrNull()
 
         val errorCodigo = when {
             estado.codigo.isBlank() -> "El codigo es obligatorio."
@@ -65,6 +66,12 @@ class ProductoViewModel(
             stockNumerico < 0 -> "El stock no puede ser negativo."
             else -> null
         }
+        val errorStockMinimo = when {
+            estado.stockMinimo.isBlank() -> "El stock minimo es obligatorio."
+            stockMinimoNumerico == null -> "El stock minimo debe ser un numero entero."
+            stockMinimoNumerico < 0 -> "El stock minimo no puede ser negativo."
+            else -> null
+        }
 
         _estadoFormulario.update {
             it.copy(
@@ -75,13 +82,14 @@ class ProductoViewModel(
                     errorCategoria,
                     errorTipo,
                     errorPrecio,
-                    errorStockActual
+                    errorStockActual,
+                    errorStockMinimo
                 )
             )
         }
         return errorCodigo == null && errorNombre == null && errorDescripcion == null &&
                 errorCategoria == null && errorTipo == null &&
-                errorPrecio == null && errorStockActual == null
+                errorPrecio == null && errorStockActual == null && errorStockMinimo == null
     }
 
     fun crearProducto(): Boolean {
@@ -102,12 +110,14 @@ class ProductoViewModel(
             tipo = tipoEnum,
             precio = estado.precio.trim().toInt(),
             stockActual = estado.stockActual.trim().toInt(),
+            stockMinimo = estado.stockMinimo.trim().toInt(),
             detalle = estado.detalle.trim().ifBlank { null }
+
         )
 
         viewModelScope.launch { repository.guardar(producto) }
 
-        _estadoFormulario.value = FormularioProducto() // limpia el formulario
+        _estadoFormulario.value = FormularioProducto()
         return true
     }
 }
