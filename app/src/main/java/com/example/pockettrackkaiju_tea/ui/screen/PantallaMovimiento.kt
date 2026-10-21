@@ -69,7 +69,6 @@ fun PantallaMovimiento(
         }
     }
 
-    // Stock del producto elegido, leído de la lista para que esté siempre al día
     val stockActual = estado.producto?.let { elegido ->
         productos.find { it.id == elegido.id }?.stockActual
     }
@@ -171,7 +170,7 @@ fun PantallaMovimiento(
                 }
             }
 
-            // Cantidad
+
             OutlinedTextField(
                 value = estado.cantidad,
                 onValueChange = viewModel::actualizarCantidad,
@@ -186,7 +185,6 @@ fun PantallaMovimiento(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Motivo
             OutlinedTextField(
                 value = estado.motivo,
                 onValueChange = viewModel::actualizarMotivo,
@@ -202,7 +200,7 @@ fun PantallaMovimiento(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Responsable
+
             ExposedDropdownMenuBox(
                 expanded = menuResponsableExpandido,
                 onExpandedChange = { menuResponsableExpandido = !menuResponsableExpandido },
@@ -286,7 +284,7 @@ fun PantallaMovimiento(
     }
 }
 
-private fun etiquetaTipo(tipo: TipoMovimiento): String = when (tipo) {
+fun etiquetaTipo(tipo: TipoMovimiento): String = when (tipo) {
     TipoMovimiento.ENTRADA -> "Entrada"
     TipoMovimiento.SALIDA_VENTA -> "Salida por venta"
     TipoMovimiento.SALIDA_CONSUMO -> "Salida por consumo"

@@ -20,4 +20,9 @@ interface UsuarioDao {
     suspend fun eliminar(usuario: Usuario)
     @Query("SELECT COUNT(*) FROM usuarios")
     suspend fun contar(): Int
+    @Query("SELECT * FROM usuarios WHERE correo = :correo")
+    suspend fun obtenerPorCorreo(correo: String): Usuario?
+
+    @Query("SELECT * FROM usuarios WHERE correo = :correo AND contra = :contra")
+    suspend fun autenticar(correo: String, contra: String): Usuario?
 }

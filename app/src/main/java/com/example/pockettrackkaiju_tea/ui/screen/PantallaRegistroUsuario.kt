@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -26,11 +27,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.viewmodel.RegistroUsuarioViewModel
 import androidx.compose.ui.text.input.ImeAction
+import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 
 
 @Composable
 fun PantallaRegistroUsuario(
-    viewModel: RegistroUsuarioViewModel = viewModel(),
+    viewModel: RegistroUsuarioViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
     onRegistroExitoso: () -> Unit = {}
 ) {
     val estado by viewModel.estadoFormulario.collectAsStateWithLifecycle()

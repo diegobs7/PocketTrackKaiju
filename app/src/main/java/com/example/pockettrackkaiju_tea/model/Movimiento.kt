@@ -1,6 +1,5 @@
 package com.example.pockettrackkaiju_tea.model
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -20,8 +19,7 @@ data class Movimiento(
     val cantidad: Int,
     val motivo: String,
     val fecha: String,
-    @Embedded(prefix = "usuario_")
-    val usuario: Usuario
+    val responsable: String
 )
 
 

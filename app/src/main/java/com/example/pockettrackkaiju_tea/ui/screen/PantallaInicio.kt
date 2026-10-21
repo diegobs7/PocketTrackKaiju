@@ -1,69 +1,83 @@
 package com.example.pockettrackkaiju_tea.ui.screen
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.pockettrackkaiju_tea.navigation.Rutas
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.pockettrackkaiju_tea.ui.components.TarjetaMovimiento
+import com.example.pockettrackkaiju_tea.ui.components.TarjetaResumen
+import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaInicio(navController: NavController) {
-    val backStackEntry by navController.currentBackStackEntryAsState()
-    val rutaActual = backStackEntry?.destination?.route
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("PocketTrack Kaiju")},
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+fun PantallaInicio(viewModel: InventarioViewModel) {
+    val productos by viewModel.productos.collectAsStateWithLifecycle()
+    val movimientos by viewModel.movimientos.collectAsStateWithLifecycle()
+
+    val enAlerta = productos.count { viewModel.estaEnAlerta(it) }
+    val ultimosMovimientos = movimientos.take(3)
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        item {
+            Text(
+                text = "Resumen del inventario",
+                style = MaterialTheme.typography.headlineSmall
             )
-        },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = rutaActual == Rutas.Inicio.ruta,
-                    onClick = {
-                        navController.navigate(Rutas.Inicio.ruta) {launchSingleTop = true}
-                    },
-                    icon = { Icon(Icons.Filled.Home, contentDescription = "Inicio") },
-                    label = {Text("Inicio")}
+        }
+
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                TarjetaResumen(
+                    titulo = "Productos",
+                    valor = productos.size,
+                    modifier = Modifier.weight(1f)
                 )
-                NavigationBarItem(
-                    selected = rutaActual == Rutas.Login.ruta,
-                    onClick = {
-                        navController.navigate(Rutas.Login.ruta) { launchSingleTop = true}
-                    },
-                    icon = {Icon(Icons.Filled.Person, contentDescription = "Perfil")},
-                    label = {Text("Perfil")}
+                TarjetaResumen(
+                    titulo = "En alerta",
+                    valor = enAlerta,
+                    modifier = Modifier.weight(1f),
+                    destacada = enAlerta > 0
+                )
+                TarjetaResumen(
+                    titulo = "Movimientos",
+                    valor = movimientos.size,
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
-    ) { padding ->
-        Box(
-            modifier = Modifier.fillMaxSize()
-                .padding(padding)
-        ) {
-            // Contenido principal de la pantalla Inicio
+
+        item {
+            Text(
+                text = "Últimos movimientos",
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+
+        if (ultimosMovimientos.isEmpty()) {
+            item { Text("Aún no hay movimientos registrados.") }
+        } else {
+            items(ultimosMovimientos, key = { it.id }) { movimiento ->
+                TarjetaMovimiento(
+                    movimiento = movimiento,
+                    nombreProducto = productos.find { it.codigo == movimiento.codigoProducto }?.nombre
+                )
+            }
         }
     }
-
 }

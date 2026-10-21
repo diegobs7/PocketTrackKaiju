@@ -13,10 +13,16 @@ class UsuarioRepository(private val dao: UsuarioDao) {
 
     suspend fun eliminar(usuario: Usuario) = dao.eliminar(usuario)
 
+    suspend fun existeCorreo(correo: String): Boolean =
+        dao.obtenerPorCorreo(correo.trim().lowercase()) != null
+
+    suspend fun autenticar(correo: String, contra: String): Usuario? =
+        dao.autenticar(correo.trim().lowercase(), contra)
+
     suspend fun cargarUsuariosDePrueba() {
         if (dao.contar() > 0) return
-        dao.insertar(Usuario(nombre = "Thomas Araya", rol = Rol.VENDEDOR))
-        dao.insertar(Usuario(nombre = "Andres Marin", rol = Rol.ADMINISTRADOR))
-        dao.insertar(Usuario(nombre = "Diego Bergeret", rol = Rol.ENCARGADO_INVENTARIO))
+        dao.insertar(Usuario(nombre = "Thomas Araya", correo = "thomas@kaiju.cl", contra = "1234", rol = Rol.VENDEDOR))
+        dao.insertar(Usuario(nombre = "Andrés Marín", correo = "andres@kaiju.cl", contra = "1234", rol = Rol.ADMINISTRADOR))
+        dao.insertar(Usuario(nombre = "Diego Bergeret", correo = "diego@kaiju.cl", contra = "1234", rol = Rol.ENCARGADO_INVENTARIO))
     }
 }

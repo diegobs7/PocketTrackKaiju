@@ -1,7 +1,6 @@
 package com.example.pockettrackkaiju_tea.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,9 +11,7 @@ import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,7 +26,9 @@ import com.example.pockettrackkaiju_tea.ui.screen.PantallaCatalogo
 import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.ui.platform.LocalContext
-import com.example.pockettrackkaiju_tea.ui.screen.PantallaMovimiento
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaAlertas
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaInicio
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaMovimientos
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaRegistroProducto
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 
@@ -169,27 +168,16 @@ fun MiNavHost(
                 )
             }
             composable(Rutas.Inicio.ruta) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "Pantalla de Inicio en desarrollo",
-                        textAlign = TextAlign.Center
-                    )
-                }
+                PantallaInicio(inventarioViewModel)
             }
-
             composable(Rutas.Catalogo.ruta) {
                 PantallaCatalogo(inventarioViewModel)
             }
             composable(Rutas.Movimiento.ruta) {
-                PantallaMovimiento()
+                PantallaMovimientos(inventarioViewModel)
             }
             composable(Rutas.Alerta.ruta) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
-                    Text(
-                        text = "Pantalla de Alertas en desarrollo",
-                        textAlign = TextAlign.Center
-                    )
-                }
+                PantallaAlertas(inventarioViewModel)
             }
             composable(Rutas.RegistroProducto.ruta) {
                 PantallaRegistroProducto(
