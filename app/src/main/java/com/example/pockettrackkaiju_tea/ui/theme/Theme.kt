@@ -14,23 +14,51 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     primary = RosadoKaiju,
     onPrimary = TextoBlanco,
+    primaryContainer = MoradoOscuroKaiju,
+    onPrimaryContainer = TextoBlanco,
+
     secondary = MoradoKaiju,
     onSecondary = TextoBlanco,
+    secondaryContainer = TarjetaOscuraKaiju,
+    onSecondaryContainer = TextoBlanco,
+
     tertiary = AmarilloKaiju,
     onTertiary = Color.Black,
+    tertiaryContainer = AmbarKaiju,
+    onTertiaryContainer = Color.Black,
+
     background = FondoOscuroKaiju,
-    surface = FondoOscuroKaiju
+    onBackground = TextoBlanco,
+
+    surface = SuperficieOscuraKaiju,
+    onSurface = TextoBlanco,
+    surfaceVariant = TarjetaOscuraKaiju,
+    onSurfaceVariant = TextoBlanco
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = MoradoKaiju,
     onPrimary = TextoBlanco,
+    primaryContainer = Color(0xFFE9DDFF),
+    onPrimaryContainer = MoradoOscuroKaiju,
+
     secondary = RosadoKaiju,
     onSecondary = TextoBlanco,
+    secondaryContainer = Color(0xFFFFD9E4),
+    onSecondaryContainer = Color(0xFF8C0B48),
+
     tertiary = AmarilloKaiju,
     onTertiary = Color.Black,
+    tertiaryContainer = AmbarKaiju,
+    onTertiaryContainer = Color.Black,
+
     background = TextoBlanco,
-    surface = Color(0xFFF5F5F5)
+    onBackground = Color(0xFF141018),
+
+    surface = SuperficieClaraKaiju,
+    onSurface = Color(0xFF141018),
+    surfaceVariant = Color(0xFFE7DFEC),
+    onSurfaceVariant = MoradoOscuroKaiju
 )
 
 @Composable
