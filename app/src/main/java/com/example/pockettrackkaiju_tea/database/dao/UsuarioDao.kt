@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.model.Usuario
 import kotlinx.coroutines.flow.Flow
 
@@ -27,4 +28,7 @@ interface UsuarioDao {
     suspend fun autenticar(correo: String, contra: String): Usuario?
     @Query("SELECT * FROM usuarios WHERE id = :id")
     suspend fun obtenerPorId(id: Int): Usuario?
+
+    @Query("UPDATE usuarios SET rol = :rol WHERE id = :id")
+    suspend fun cambiarRol(id: Int, rol: Rol)
 }

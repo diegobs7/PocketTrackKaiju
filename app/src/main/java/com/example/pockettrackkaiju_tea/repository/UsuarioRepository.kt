@@ -21,6 +21,9 @@ class UsuarioRepository(private val dao: UsuarioDao) {
 
     suspend fun obtenerPorId(id: Int): Usuario? = dao.obtenerPorId(id)
 
+    suspend fun cambiarRol(usuario: Usuario, nuevoRol: Rol) =
+        dao.cambiarRol(usuario.id, nuevoRol)
+
     suspend fun cargarUsuariosDePrueba() {
         if (dao.contar() > 0) return
         dao.insertar(Usuario(nombre = "Thomas Araya", correo = "thomas@kaiju.cl", contra = "1234", rol = Rol.VENDEDOR))
