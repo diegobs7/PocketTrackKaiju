@@ -9,9 +9,10 @@ import com.example.pockettrackkaiju_tea.repository.ProductoRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class InventarioViewModel(
-    productoRepository: ProductoRepository,
+    private val productoRepository: ProductoRepository,
     movimientoRepository: MovimientoRepository
 ) : ViewModel() {
 
@@ -29,4 +30,11 @@ class InventarioViewModel(
 
     fun movimientosDe(codigo: String): List<Movimiento> =
         movimientos.value.filter { it.codigoProducto.equals(codigo, ignoreCase = true) }
+    fun tieneMovimientos(producto: Producto): Boolean =
+        movimientosDe(producto.codigo).isNotEmpty()
+
+    fun eliminarProducto(producto: Producto) {
+        if (tieneMovimientos(producto)) return
+        viewModelScope.launch { productoRepository.eliminar(producto) }
+    }
 }

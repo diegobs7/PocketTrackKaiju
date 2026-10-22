@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,18 +38,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pockettrackkaiju_tea.model.CategoriaProducto
+import com.example.pockettrackkaiju_tea.model.Producto
+import com.example.pockettrackkaiju_tea.ui.components.DialogoEliminarProducto
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaProducto
 import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PantallaCatalogo(viewModel: InventarioViewModel) {
+fun PantallaCatalogo(
+    viewModel: InventarioViewModel,
+    esAdministrador: Boolean = false,
+    onEditar: (Producto) -> Unit = {}
+) {
     val productos by viewModel.productos.collectAsStateWithLifecycle()
 
     var textoBusqueda by remember { mutableStateOf("") }
     var categoriaSeleccionada by remember { mutableStateOf<CategoriaProducto?>(null) }
     var busquedaExpandida by remember { mutableStateOf(false) }
-
+    var productoAEliminar by remember { mutableStateOf<Producto?>(null) }
 
     var menuCategoriaExpandido by remember { mutableStateOf(false) }
 
@@ -61,10 +68,21 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
         coincideTexto && coincideCategoria
     }
 
+    productoAEliminar?.let { producto ->
+        DialogoEliminarProducto(
+            producto = producto,
+            tieneMovimientos = viewModel.tieneMovimientos(producto),
+            onConfirmar = {
+                viewModel.eliminarProducto(producto)
+                productoAEliminar = null
+            },
+            onCerrar = { productoAEliminar = null }
+        )
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
 
         Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp)) {
-
 
             Row(
                 modifier = Modifier
@@ -96,7 +114,6 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
                         singleLine = true
                     )
                 } else {
-
                     Box(modifier = Modifier.fillMaxWidth()) {
                         Text(
                             text = "Catálogo",
@@ -115,14 +132,12 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-
             ExposedDropdownMenuBox(
                 expanded = menuCategoriaExpandido,
                 onExpandedChange = { menuCategoriaExpandido = !menuCategoriaExpandido },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-
                     value = categoriaSeleccionada?.displayName ?: "Todas las categorías",
                     onValueChange = {},
                     readOnly = true,
@@ -140,7 +155,6 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
                     expanded = menuCategoriaExpandido,
                     onDismissRequest = { menuCategoriaExpandido = false }
                 ) {
-
                     DropdownMenuItem(
                         text = { Text("Todas las categorías") },
                         onClick = {
@@ -148,7 +162,6 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
                             menuCategoriaExpandido = false
                         }
                     )
-
 
                     CategoriaProducto.entries.forEach { categoria ->
                         DropdownMenuItem(
@@ -164,7 +177,6 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -184,10 +196,25 @@ fun PantallaCatalogo(viewModel: InventarioViewModel) {
                 }
             } else {
                 items(productosFiltrados, key = { it.codigo }) { producto ->
-                    TarjetaProducto(
-                        producto = producto,
-                        enAlerta = viewModel.estaEnAlerta(producto)
-                    )
+                    Column {
+                        TarjetaProducto(
+                            producto = producto,
+                            enAlerta = viewModel.estaEnAlerta(producto)
+                        )
+                        if (esAdministrador) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                TextButton(onClick = { onEditar(producto) }) {
+                                    Text("Editar")
+                                }
+                                TextButton(onClick = { productoAEliminar = producto }) {
+                                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
