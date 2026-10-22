@@ -44,6 +44,9 @@ import com.example.pockettrackkaiju_tea.model.puedeGestionarProductos
 import com.example.pockettrackkaiju_tea.model.puedeVerAlertas
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.compose.material.icons.filled.Group
+import com.example.pockettrackkaiju_tea.model.puedeGestionarUsuarios
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaUsuarios
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -204,6 +207,21 @@ fun MiNavHost(
                             }
                         )
                     }
+                    if (rol?.puedeGestionarUsuarios() == true) {
+                        NavigationBarItem(
+                            selected = rutaActual == Rutas.Usuarios.ruta,
+                            onClick = { navegarAPestana(Rutas.Usuarios.ruta) },
+                            icon = { Icon(Icons.Filled.Group, contentDescription = "Usuarios") },
+                            label = {
+                                Text(
+                                    text = "Usuarios",
+                                    fontSize = 10.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        )
+                    }
                 }
             }
         },
@@ -271,6 +289,9 @@ fun MiNavHost(
                 PantallaRegistroProducto(
                     onRegistroExitoso = { navController.popBackStack() }
                 )
+            }
+            composable(Rutas.Usuarios.ruta) {
+                usuario?.let { PantallaUsuarios(it) }
             }
         }
     }

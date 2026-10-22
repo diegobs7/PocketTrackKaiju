@@ -37,6 +37,8 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
 
         modelClass.isAssignableFrom(SesionViewModel::class.java) ->
             SesionViewModel(usuarioRepository, SesionGuardada(appContext))
+        modelClass.isAssignableFrom(UsuariosViewModel::class.java) ->
+            UsuariosViewModel(usuarioRepository, movimientoRepository)
         else -> throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
     } as T
 }
