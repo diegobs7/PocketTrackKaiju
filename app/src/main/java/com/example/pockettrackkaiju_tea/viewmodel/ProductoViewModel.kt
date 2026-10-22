@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -20,6 +21,7 @@ class ProductoViewModel(
     private val repository: ProductoRepository
 ) : ViewModel() {
 
+    private var productoEnEdicion: Producto? = null
     private val _estadoFormulario = MutableStateFlow(FormularioProducto())
     val estadoFormulario: StateFlow<FormularioProducto> = _estadoFormulario.asStateFlow()
 
@@ -45,7 +47,8 @@ class ProductoViewModel(
 
         val errorCodigo = when {
             estado.codigo.isBlank() -> "El codigo es obligatorio."
-            codigosExistentes.any { it.equals(estado.codigo.trim(), ignoreCase = true) } ->
+            productoEnEdicion == null &&
+                    codigosExistentes.any { it.equals(estado.codigo.trim(), ignoreCase = true) } ->
                 "Ya existe un producto con ese codigo."
             else -> null
         }
@@ -120,4 +123,46 @@ class ProductoViewModel(
         _estadoFormulario.value = FormularioProducto()
         return true
     }
+    fun guardarCambios(): Boolean {
+        val original = productoEnEdicion ?: return false
+        if (!validarFormulario()) return false
+
+        val estado = _estadoFormulario.value
+        val categoriaEnum = CategoriaProducto.entries.find { it.displayName == estado.categoria }
+            ?: original.categoria
+        val tipoEnum = TipoProducto.entries.find { it.displayName == estado.tipo }
+            ?: original.tipo
+
+        val ultimo = productos.value.find { it.id == original.id } ?: original
+        val actualizado = ultimo.copy(
+            nombre = estado.nombre.trim(),
+            descripcion = estado.descripcion.trim(),
+            categoria = categoriaEnum,
+            tipo = tipoEnum,
+            precio = estado.precio.trim().toInt(),
+            stockMinimo = estado.stockMinimo.trim().toInt(),
+            detalle = estado.detalle.trim().ifBlank { null }
+        )
+
+        viewModelScope.launch { repository.actualizar(actualizado) }
+        return true
+    }
+    fun cargarParaEditar(productoId: Int) {
+        viewModelScope.launch {
+            val producto = repository.productos.first().find { it.id == productoId } ?: return@launch
+            productoEnEdicion = producto
+            _estadoFormulario.value = FormularioProducto(
+                codigo = producto.codigo,
+                nombre = producto.nombre,
+                descripcion = producto.descripcion,
+                categoria = producto.categoria.displayName,
+                tipo = producto.tipo.displayName,
+                precio = producto.precio.toString(),
+                stockActual = producto.stockActual.toString(),
+                stockMinimo = producto.stockMinimo.toString(),
+                detalle = producto.detalle ?: ""
+            )
+        }
+    }
+
 }

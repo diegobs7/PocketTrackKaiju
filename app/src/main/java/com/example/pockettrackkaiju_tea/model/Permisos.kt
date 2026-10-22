@@ -13,3 +13,6 @@ fun Rol.tiposDeMovimientoPermitidos(): List<TipoMovimiento> = when (this) {
         TipoMovimiento.AJUSTE
     )
 }
+fun Rol.puedeGestionarProductos(): Boolean = this == Rol.ADMINISTRADOR
+
+fun Rol.puedeVerVentas(): Boolean = this == Rol.ADMINISTRADOR

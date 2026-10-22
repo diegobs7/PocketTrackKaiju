@@ -40,7 +40,10 @@ import com.example.pockettrackkaiju_tea.viewmodel.LoginViewModel
 import com.example.pockettrackkaiju_tea.viewmodel.SesionViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pockettrackkaiju_tea.model.puedeAgregarProductos
+import com.example.pockettrackkaiju_tea.model.puedeGestionarProductos
 import com.example.pockettrackkaiju_tea.model.puedeVerAlertas
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,8 +68,13 @@ fun MiNavHost(
         if (sesionViewModel.usuarioActual.value != null) Rutas.Inicio.ruta else Rutas.InicioSesion.ruta
     }
 
-    val rutasSinBarra = listOf(Rutas.InicioSesion.ruta, Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta)
-    val rutasConBotonAtras = listOf(Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta)
+    val rutasSinBarra = listOf(
+        Rutas.InicioSesion.ruta, Rutas.RegistroUsuario.ruta,
+        Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta
+    )
+    val rutasConBotonAtras = listOf(
+        Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta
+    )
     val mostrarBotonAtras = rutaActual in rutasConBotonAtras
     val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
 
@@ -232,11 +240,26 @@ fun MiNavHost(
                     onRegistroExitoso = { navController.popBackStack() }
                 )
             }
+            composable(
+                route = Rutas.EditarProducto.ruta,
+                arguments = listOf(navArgument("productoId") { type = NavType.IntType })
+            ) { entrada ->
+                PantallaRegistroProducto(
+                    productoId = entrada.arguments?.getInt("productoId"),
+                    onRegistroExitoso = { navController.popBackStack() }
+                )
+            }
             composable(Rutas.Inicio.ruta) {
                 usuario?.let { PantallaInicio(inventarioViewModel, it) }
             }
             composable(Rutas.Catalogo.ruta) {
-                PantallaCatalogo(inventarioViewModel)
+                PantallaCatalogo(
+                    viewModel = inventarioViewModel,
+                    esAdministrador = rol?.puedeGestionarProductos() == true,
+                    onEditar = { producto ->
+                        navController.navigate(Rutas.EditarProducto.crearRuta(producto.id))
+                    }
+                )
             }
             composable(Rutas.Movimiento.ruta) {
                 usuario?.let { PantallaMovimientos(inventarioViewModel, it) }

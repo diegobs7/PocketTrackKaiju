@@ -52,10 +52,17 @@ import kotlin.time.Duration.Companion.seconds
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaRegistroProducto(
+    productoId: Int? = null,
     viewModel: ProductoViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
     onRegistroExitoso: () -> Unit = {}
 ) {
     val estado by viewModel.estadoFormulario.collectAsStateWithLifecycle()
+
+    val esEdicion = productoId != null
+
+    LaunchedEffect(productoId) {
+        if (productoId != null) viewModel.cargarParaEditar(productoId)
+    }
 
     var menuCategoriaExpandido by remember { mutableStateOf(false) }
     var menuTipoExpandido by remember { mutableStateOf(false) }
@@ -63,9 +70,8 @@ fun PantallaRegistroProducto(
     var mostrarMensajeExito by remember { mutableStateOf(false) }
 
     val intentarRegistrar: () -> Unit = {
-        if (viewModel.crearProducto()) {
-            mostrarMensajeExito = true
-        }
+        val exito = if (esEdicion) viewModel.guardarCambios() else viewModel.crearProducto()
+        if (exito) mostrarMensajeExito = true
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -78,7 +84,7 @@ fun PantallaRegistroProducto(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Registrar producto",
+                text = if (esEdicion) "Editar producto" else "Registrar producto",
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
@@ -90,7 +96,12 @@ fun PantallaRegistroProducto(
                 onValueChange = viewModel::actualizarCodigo,
                 label = { Text("Código") },
                 isError = estado.errores.errorCodigo != null,
-                supportingText = { estado.errores.errorCodigo?.let { Text(it) } },
+                readOnly = esEdicion,
+                supportingText = {
+                    val mensaje = estado.errores.errorCodigo
+                        ?: if (esEdicion) "El código no se puede cambiar." else null
+                    mensaje?.let { Text(it) }
+                },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
@@ -219,7 +230,12 @@ fun PantallaRegistroProducto(
                 onValueChange = viewModel::actualizarStockActual,
                 label = { Text("Stock actual") },
                 isError = estado.errores.errorStockActual != null,
-                supportingText = { estado.errores.errorStockActual?.let { Text(it) } },
+                readOnly = esEdicion,
+                supportingText = {
+                    val mensaje = estado.errores.errorStockActual
+                        ?: if (esEdicion) "El stock solo cambia con movimientos." else null
+                    mensaje?.let { Text(it) }
+                },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next
@@ -267,7 +283,7 @@ fun PantallaRegistroProducto(
                     .fillMaxWidth()
                     .height(50.dp)
             ) {
-                Text("Registrar producto")
+                Text(if (esEdicion) "Guardar cambios" else "Registrar producto")
             }
         }
 
@@ -288,7 +304,7 @@ fun PantallaRegistroProducto(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "¡Producto registrado con éxito!",
+                    text = if (esEdicion) "¡Producto actualizado con éxito!" else "¡Producto registrado con éxito!",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
