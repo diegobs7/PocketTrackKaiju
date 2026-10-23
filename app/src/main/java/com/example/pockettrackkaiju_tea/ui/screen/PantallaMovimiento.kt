@@ -11,10 +11,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -44,6 +49,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.model.TipoMovimiento
 import com.example.pockettrackkaiju_tea.model.Usuario
 import com.example.pockettrackkaiju_tea.model.tiposDeMovimientoPermitidos
+import com.example.pockettrackkaiju_tea.ui.components.CamaraNativa
+import com.example.pockettrackkaiju_tea.ui.components.ModoCamara
 import com.example.pockettrackkaiju_tea.ui.components.etiquetaRol
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.MovimientoViewModel
@@ -64,6 +71,9 @@ fun PantallaMovimiento(
 
     var mostrarMensajeExito by remember { mutableStateOf(false) }
 
+    var mostrarCamara by remember { mutableStateOf(false) }
+    var errorEscaneo by remember { mutableStateOf<String?>(null) }
+
     val intentarRegistrar: () -> Unit = {
         if (viewModel.registrarMovimiento(usuario)) {
             mostrarMensajeExito = true
@@ -72,6 +82,23 @@ fun PantallaMovimiento(
 
     val stockActual = estado.producto?.let { elegido ->
         productos.find { it.id == elegido.id }?.stockActual
+    }
+
+    if (mostrarCamara) {
+        CamaraNativa(
+            modo = ModoCamara.ESCANEAR_CODIGO,
+            onCerrar = { mostrarCamara = false },
+            onCodigoEscaneado = { codigo ->
+                mostrarCamara = false
+                val encontrado = productos.find { it.codigo.equals(codigo.trim(), ignoreCase = true) }
+                if (encontrado != null) {
+                    viewModel.seleccionarProducto(encontrado)
+                    errorEscaneo = null
+                } else {
+                    errorEscaneo = "No existe un producto con el código \"${codigo.trim()}\"."
+                }
+            }
+        )
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -133,6 +160,18 @@ fun PantallaMovimiento(
                 }
             }
 
+
+            OutlinedButton(
+                onClick = { errorEscaneo = null; mostrarCamara = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Escanear código del producto")
+            }
+            errorEscaneo?.let {
+                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
 
             ExposedDropdownMenuBox(
                 expanded = menuTipoExpandido,
