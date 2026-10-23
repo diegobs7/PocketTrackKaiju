@@ -5,17 +5,25 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
@@ -34,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -44,6 +53,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.model.CategoriaProducto
 import com.example.pockettrackkaiju_tea.model.TipoProducto
+import com.example.pockettrackkaiju_tea.ui.components.CamaraNativa
+import com.example.pockettrackkaiju_tea.ui.components.FotoProducto
+import com.example.pockettrackkaiju_tea.ui.components.ModoCamara
+import com.example.pockettrackkaiju_tea.util.FotosProducto
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.ProductoViewModel
 import kotlinx.coroutines.delay
@@ -69,9 +82,31 @@ fun PantallaRegistroProducto(
 
     var mostrarMensajeExito by remember { mutableStateOf(false) }
 
+    val contexto = LocalContext.current
+    var modoCamara by remember { mutableStateOf<ModoCamara?>(null) }
+    var versionFoto by remember { mutableStateOf(0) }
+    var avisoCamara by remember { mutableStateOf<String?>(null) }
+
     val intentarRegistrar: () -> Unit = {
         val exito = if (esEdicion) viewModel.guardarCambios() else viewModel.crearProducto()
         if (exito) mostrarMensajeExito = true
+    }
+
+    modoCamara?.let { modo ->
+        CamaraNativa(
+            modo = modo,
+            onCerrar = { modoCamara = null },
+            onCodigoEscaneado = { codigo ->
+                viewModel.actualizarCodigo(codigo.trim())
+                avisoCamara = null
+                modoCamara = null
+            },
+            archivoDestino = FotosProducto.archivo(contexto, estado.codigo),
+            onFotoCapturada = {
+                versionFoto++
+                modoCamara = null
+            }
+        )
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -105,6 +140,48 @@ fun PantallaRegistroProducto(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (!esEdicion) {
+                    OutlinedButton(
+                        onClick = { avisoCamara = null; modoCamara = ModoCamara.ESCANEAR_CODIGO },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
+                        Spacer(Modifier.width(6.dp))
+                        Text("Escanear")
+                    }
+                }
+                OutlinedButton(
+                    onClick = {
+                        if (estado.codigo.isBlank()) {
+                            avisoCamara = "Ingresa o escanea el código antes de tomar la foto."
+                        } else {
+                            avisoCamara = null
+                            modoCamara = ModoCamara.TOMAR_FOTO
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(Icons.Filled.CameraAlt, contentDescription = null)
+                    Spacer(Modifier.width(6.dp))
+                    Text("Tomar foto")
+                }
+            }
+            avisoCamara?.let {
+                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
+            FotoProducto(
+                codigo = estado.codigo,
+                version = versionFoto,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp)
+                    .clip(RoundedCornerShape(12.dp))
             )
 
             OutlinedTextField(
