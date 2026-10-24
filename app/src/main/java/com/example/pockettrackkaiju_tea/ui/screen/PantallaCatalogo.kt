@@ -48,7 +48,8 @@ import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 fun PantallaCatalogo(
     viewModel: InventarioViewModel,
     esAdministrador: Boolean = false,
-    onEditar: (Producto) -> Unit = {}
+    onEditar: (Producto) -> Unit = {},
+    onVerDetalle: (Producto) -> Unit = {}
 ) {
     val productos by viewModel.productos.collectAsStateWithLifecycle()
 
@@ -199,7 +200,8 @@ fun PantallaCatalogo(
                     Column {
                         TarjetaProducto(
                             producto = producto,
-                            enAlerta = viewModel.estaEnAlerta(producto)
+                            enAlerta = viewModel.estaEnAlerta(producto),
+                            onClick = { onVerDetalle(producto) }
                         )
                         if (esAdministrador) {
                             Row(
