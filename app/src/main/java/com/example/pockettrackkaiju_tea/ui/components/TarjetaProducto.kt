@@ -47,7 +47,7 @@ fun TarjetaProducto(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "${producto.codigo} · ${producto.categoria}",
+                        text = "${producto.codigo} · ${producto.categoria.displayName}",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }

@@ -47,6 +47,7 @@ import androidx.navigation.navArgument
 import androidx.compose.material.icons.filled.Group
 import com.example.pockettrackkaiju_tea.model.puedeGestionarUsuarios
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaUsuarios
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaDetalleProducto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +77,7 @@ fun MiNavHost(
         Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta
     )
     val rutasConBotonAtras = listOf(
-        Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta
+        Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta, Rutas.DetalleProducto.ruta
     )
     val mostrarBotonAtras = rutaActual in rutasConBotonAtras
     val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
@@ -267,6 +268,19 @@ fun MiNavHost(
                     onRegistroExitoso = { navController.popBackStack() }
                 )
             }
+            composable(
+                route = Rutas.DetalleProducto.ruta,
+                arguments = listOf(navArgument("productoId") { type = NavType.IntType })
+            ) { entrada ->
+                PantallaDetalleProducto(
+                    productoId = entrada.arguments?.getInt("productoId") ?: -1,
+                    viewModel = inventarioViewModel,
+                    puedeEditar = rol?.puedeGestionarProductos() == true,
+                    onEditar = { producto ->
+                        navController.navigate(Rutas.EditarProducto.crearRuta(producto.id))
+                    }
+                )
+            }
             composable(Rutas.Inicio.ruta) {
                 usuario?.let { PantallaInicio(inventarioViewModel, it) }
             }
@@ -276,6 +290,9 @@ fun MiNavHost(
                     esAdministrador = rol?.puedeGestionarProductos() == true,
                     onEditar = { producto ->
                         navController.navigate(Rutas.EditarProducto.crearRuta(producto.id))
+                    },
+                    onVerDetalle = { producto ->
+                        navController.navigate(Rutas.DetalleProducto.crearRuta(producto.id))
                     }
                 )
             }
