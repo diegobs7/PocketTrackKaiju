@@ -1,5 +1,10 @@
 package com.example.pockettrackkaiju_tea.navigation
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,6 +18,9 @@ import androidx.compose.material.icons.filled.Moving
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.core.content.ContextCompat
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,7 +55,6 @@ import androidx.navigation.navArgument
 import androidx.compose.material.icons.filled.Group
 import com.example.pockettrackkaiju_tea.model.puedeGestionarUsuarios
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaUsuarios
-import com.example.pockettrackkaiju_tea.ui.screen.PantallaDetalleProducto
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +75,24 @@ fun MiNavHost(
     val rutaActual = backStackEntry?.destination?.route
     val usuario by sesionViewModel.usuarioActual.collectAsStateWithLifecycle()
     val rol = usuario?.rol
+
+    val contextoActual = LocalContext.current
+    val pedirPermisoNotificaciones = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { }
+    var permisoNotificacionesPedido by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(usuario?.id) {
+        if (usuario != null &&
+            !permisoNotificacionesPedido &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
+                contextoActual, Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permisoNotificacionesPedido = true
+            pedirPermisoNotificaciones.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
     val destinoInicial = remember {
         if (sesionViewModel.usuarioActual.value != null) Rutas.Inicio.ruta else Rutas.InicioSesion.ruta
     }
@@ -77,7 +102,7 @@ fun MiNavHost(
         Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta
     )
     val rutasConBotonAtras = listOf(
-        Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta, Rutas.DetalleProducto.ruta
+        Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta
     )
     val mostrarBotonAtras = rutaActual in rutasConBotonAtras
     val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
@@ -268,19 +293,6 @@ fun MiNavHost(
                     onRegistroExitoso = { navController.popBackStack() }
                 )
             }
-            composable(
-                route = Rutas.DetalleProducto.ruta,
-                arguments = listOf(navArgument("productoId") { type = NavType.IntType })
-            ) { entrada ->
-                PantallaDetalleProducto(
-                    productoId = entrada.arguments?.getInt("productoId") ?: -1,
-                    viewModel = inventarioViewModel,
-                    puedeEditar = rol?.puedeGestionarProductos() == true,
-                    onEditar = { producto ->
-                        navController.navigate(Rutas.EditarProducto.crearRuta(producto.id))
-                    }
-                )
-            }
             composable(Rutas.Inicio.ruta) {
                 usuario?.let { PantallaInicio(inventarioViewModel, it) }
             }
@@ -290,9 +302,6 @@ fun MiNavHost(
                     esAdministrador = rol?.puedeGestionarProductos() == true,
                     onEditar = { producto ->
                         navController.navigate(Rutas.EditarProducto.crearRuta(producto.id))
-                    },
-                    onVerDetalle = { producto ->
-                        navController.navigate(Rutas.DetalleProducto.crearRuta(producto.id))
                     }
                 )
             }
