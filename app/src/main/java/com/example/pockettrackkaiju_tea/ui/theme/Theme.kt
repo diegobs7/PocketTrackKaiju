@@ -12,15 +12,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = RosadoKaiju,
-    onPrimary = TextoBlanco,
-    primaryContainer = MoradoOscuroKaiju,
-    onPrimaryContainer = TextoBlanco,
+    primary = RosadoClaroKaiju,
+    onPrimary = TextoSobreRosadoKaiju,
+    primaryContainer = RosadoContenedorKaiju,
+    onPrimaryContainer = RosadoPaliKaiju,
 
-    secondary = MoradoKaiju,
-    onSecondary = TextoBlanco,
-    secondaryContainer = TarjetaOscuraKaiju,
-    onSecondaryContainer = TextoBlanco,
+    secondary = LilaKaiju,
+    onSecondary = TextoSobreLilaKaiju,
+    secondaryContainer = LilaContenedorKaiju,
+    onSecondaryContainer = LilaPaliKaiju,
 
     tertiary = AmarilloKaiju,
     onTertiary = Color.Black,
@@ -28,12 +28,21 @@ private val DarkColorScheme = darkColorScheme(
     onTertiaryContainer = Color.Black,
 
     background = FondoOscuroKaiju,
-    onBackground = TextoBlanco,
+    onBackground = TextoClaroKaiju,
 
     surface = SuperficieOscuraKaiju,
-    onSurface = TextoBlanco,
+    onSurface = TextoClaroKaiju,
     surfaceVariant = TarjetaOscuraKaiju,
-    onSurfaceVariant = TextoBlanco
+    onSurfaceVariant = TextoSecundarioClaroKaiju,
+
+    surfaceContainerLowest = Color(0xFF0A070D),
+    surfaceContainerLow = Color(0xFF150F1D),
+    surfaceContainer = SuperficieOscuraKaiju,
+    surfaceContainerHigh = Color(0xFF221A2D),
+    surfaceContainerHighest = TarjetaOscuraKaiju,
+
+    outline = Color(0xFF8A7A9B),
+    outlineVariant = Color(0xFF3A2D4A)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -42,7 +51,7 @@ private val LightColorScheme = lightColorScheme(
     primaryContainer = Color(0xFFE9DDFF),
     onPrimaryContainer = MoradoOscuroKaiju,
 
-    secondary = RosadoKaiju,
+    secondary = RosadoProfundoKaiju,
     onSecondary = TextoBlanco,
     secondaryContainer = Color(0xFFFFD9E4),
     onSecondaryContainer = Color(0xFF8C0B48),
@@ -58,7 +67,16 @@ private val LightColorScheme = lightColorScheme(
     surface = SuperficieClaraKaiju,
     onSurface = Color(0xFF141018),
     surfaceVariant = Color(0xFFE7DFEC),
-    onSurfaceVariant = MoradoOscuroKaiju
+    onSurfaceVariant = MoradoOscuroKaiju,
+
+    surfaceContainerLowest = TextoBlanco,
+    surfaceContainerLow = Color(0xFFF9F3FC),
+    surfaceContainer = SuperficieClaraKaiju,
+    surfaceContainerHigh = Color(0xFFEFE6F5),
+    surfaceContainerHighest = Color(0xFFE7DFEC),
+
+    outline = Color(0xFF7C6B8C),
+    outlineVariant = Color(0xFFD3C6DF)
 )
 
 @Composable

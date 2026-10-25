@@ -48,6 +48,7 @@ import androidx.compose.material.icons.filled.Group
 import com.example.pockettrackkaiju_tea.model.puedeGestionarUsuarios
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaUsuarios
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaDetalleProducto
+import com.example.pockettrackkaiju_tea.ui.components.EncabezadoKaiju
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,7 +126,7 @@ fun MiNavHost(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("PocketTrack Kaiju") },
+                title = { EncabezadoKaiju() },
                 navigationIcon = {
                     if (mostrarBotonAtras) {
                         IconButton(onClick = { navController.popBackStack() }) {
