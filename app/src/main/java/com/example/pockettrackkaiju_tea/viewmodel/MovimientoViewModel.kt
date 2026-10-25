@@ -1,5 +1,6 @@
 package com.example.pockettrackkaiju_tea.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pockettrackkaiju_tea.model.ErroresMovimiento
@@ -10,6 +11,7 @@ import com.example.pockettrackkaiju_tea.model.TipoMovimiento
 import com.example.pockettrackkaiju_tea.model.Usuario
 import com.example.pockettrackkaiju_tea.repository.MovimientoRepository
 import com.example.pockettrackkaiju_tea.repository.ProductoRepository
+import com.example.pockettrackkaiju_tea.util.NotificacionesStock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,7 +26,8 @@ import java.util.TimeZone
 
 class MovimientoViewModel(
     private val productoRepository: ProductoRepository,
-    private val movimientoRepository: MovimientoRepository
+    private val movimientoRepository: MovimientoRepository,
+    private val contexto: Context? = null
 ) : ViewModel() {
 
     private val _estadoFormulario = MutableStateFlow(FormularioMovimiento())
@@ -92,8 +95,11 @@ class MovimientoViewModel(
         )
 
         viewModelScope.launch {
+            val productoActualizado = productoActual.copy(stockActual = nuevoStock)
             movimientoRepository.guardar(movimiento)
-            productoRepository.actualizar(productoActual.copy(stockActual = nuevoStock))
+            productoRepository.actualizar(productoActualizado)
+            // Avisa si el producto quedó con stock bajo (o quita el aviso si se repuso).
+            contexto?.let { NotificacionesStock.revisar(it, productoActualizado) }
         }
 
         _estadoFormulario.value = FormularioMovimiento()

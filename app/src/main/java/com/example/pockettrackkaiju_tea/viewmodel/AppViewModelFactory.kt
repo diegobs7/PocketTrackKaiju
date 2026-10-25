@@ -21,13 +21,13 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when {
         modelClass.isAssignableFrom(ProductoViewModel::class.java) ->
-            ProductoViewModel(productoRepository)
+            ProductoViewModel(productoRepository, appContext)
 
         modelClass.isAssignableFrom(InventarioViewModel::class.java) ->
             InventarioViewModel(productoRepository, movimientoRepository)
 
         modelClass.isAssignableFrom(MovimientoViewModel::class.java) ->
-            MovimientoViewModel(productoRepository, movimientoRepository)
+            MovimientoViewModel(productoRepository, movimientoRepository, appContext)
 
         modelClass.isAssignableFrom(RegistroUsuarioViewModel::class.java) ->
             RegistroUsuarioViewModel(usuarioRepository)

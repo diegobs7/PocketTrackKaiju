@@ -1,5 +1,6 @@
 package com.example.pockettrackkaiju_tea.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pockettrackkaiju_tea.model.CategoriaProducto
@@ -8,6 +9,7 @@ import com.example.pockettrackkaiju_tea.model.FormularioProducto
 import com.example.pockettrackkaiju_tea.model.Producto
 import com.example.pockettrackkaiju_tea.model.TipoProducto
 import com.example.pockettrackkaiju_tea.repository.ProductoRepository
+import com.example.pockettrackkaiju_tea.util.NotificacionesStock
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProductoViewModel(
-    private val repository: ProductoRepository
+    private val repository: ProductoRepository,
+    private val contexto: Context? = null
 ) : ViewModel() {
 
     private var productoEnEdicion: Producto? = null
@@ -118,7 +121,10 @@ class ProductoViewModel(
 
         )
 
-        viewModelScope.launch { repository.guardar(producto) }
+        viewModelScope.launch {
+            repository.guardar(producto)
+            contexto?.let { NotificacionesStock.revisar(it, producto) }
+        }
 
         _estadoFormulario.value = FormularioProducto()
         return true
@@ -144,7 +150,10 @@ class ProductoViewModel(
             detalle = estado.detalle.trim().ifBlank { null }
         )
 
-        viewModelScope.launch { repository.actualizar(actualizado) }
+        viewModelScope.launch {
+            repository.actualizar(actualizado)
+            contexto?.let { NotificacionesStock.revisar(it, actualizado) }
+        }
         return true
     }
     fun cargarParaEditar(productoId: Int) {
