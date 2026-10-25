@@ -37,4 +37,7 @@ class InventarioViewModel(
         if (tieneMovimientos(producto)) return
         viewModelScope.launch { productoRepository.eliminar(producto) }
     }
+    init {
+        viewModelScope.launch { productoRepository.cargarProductosDePrueba() }
+    }
 }
