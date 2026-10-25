@@ -110,7 +110,7 @@ fun CamaraNativa(
         if (!permisoConcedido) solicitarPermiso.launch(Manifest.permission.CAMERA)
     }
 
-    // Si el usuario vuelve desde los ajustes del sistema con el permiso ya dado.
+
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         permisoConcedido = tienePermiso()
     }
