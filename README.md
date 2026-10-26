@@ -68,4 +68,3 @@ El catálogo parte vacío: entrar como administrador y crear productos con el bo
 ## Créditos
 - Tipografía **Unbounded** (solo en el encabezado), © The Unbounded Project Authors, licencia SIL Open Font License 1.1. Ver `LICENCIA_Unbounded_OFL.txt`.
 - Logo de Kaiju Serigrafía, usado con fines académicos.
-- Link Drive: https://drive.google.com/drive/folders/1mIGXUw-aqeLa104GZ0dn6G4jYbKgph-0?usp=sharing
