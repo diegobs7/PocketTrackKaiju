@@ -16,7 +16,7 @@ object ProductosDePrueba {
             tipo = TipoProducto.POLERA,
             precio = 16990,
             stockActual = 25,
-            stockMinimo = 10,
+            stockMinimo = 5,
             detalle = "Estampado en serigrafía tradicional"
         ),
         Producto(
@@ -26,7 +26,7 @@ object ProductosDePrueba {
             categoria = CategoriaProducto.VIDEOJUEGOS,
             tipo = TipoProducto.POLERON_CANGURO,
             precio = 32990,
-            stockActual = 8,
+            stockActual = 10,
             stockMinimo = 5
         ),
         Producto(
@@ -47,7 +47,7 @@ object ProductosDePrueba {
             categoria = CategoriaProducto.ANIME,
             tipo = TipoProducto.POLERA_MANGA_LARGA,
             precio = 19990,
-            stockActual = 4,
+            stockActual = 10,
             stockMinimo = 5
         ),
         Producto(
@@ -58,7 +58,7 @@ object ProductosDePrueba {
             tipo = TipoProducto.POLERA,
             precio = 15990,
             stockActual = 20,
-            stockMinimo = 10,
+            stockMinimo = 5,
             detalle = "Edición limitada"
         ),
         Producto(
@@ -79,7 +79,7 @@ object ProductosDePrueba {
             tipo = TipoProducto.POLERA,
             precio = 17990,
             stockActual = 30,
-            stockMinimo = 15,
+            stockMinimo = 5,
             detalle = "Diseño exclusivo de la marca"
         ),
         Producto(
@@ -89,8 +89,8 @@ object ProductosDePrueba {
             categoria = CategoriaProducto.ANIME,
             tipo = TipoProducto.POLERA_SIN_MANGAS,
             precio = 14990,
-            stockActual = 6,
-            stockMinimo = 8
+            stockActual = 10,
+            stockMinimo = 5
         ),
         Producto(
             codigo = "KAI-009",
@@ -100,7 +100,7 @@ object ProductosDePrueba {
             tipo = TipoProducto.ACCESORIOS,
             precio = 4990,
             stockActual = 50,
-            stockMinimo = 20,
+            stockMinimo = 5,
             detalle = "Incluye los iniciales de Kanto"
         ),
         Producto(
@@ -110,7 +110,7 @@ object ProductosDePrueba {
             categoria = CategoriaProducto.ANIME,
             tipo = TipoProducto.POLERON_CANGURO,
             precio = 34990,
-            stockActual = 3,
+            stockActual = 10,
             stockMinimo = 5,
             detalle = "Algodón peinado premium"
         )
