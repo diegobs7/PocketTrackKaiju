@@ -1,6 +1,9 @@
 # PocketTrackKaiju — Grupo TDA
 
-**Integrantes:** Thomas Araya, Diego Bergeret, Andres Marin
+**Integrantes:**
+Andres Marin · andr.marin@duocuc.cl
+Thomas Araya · thom.araya@duocuc.cl
+Diego Bergeret · di.bergeret@duocuc.cl
 
 **Caso:** Gestión y trazabilidad de inventario para Kaiju. La tienda llevaba el control de stock en registros manuales y planillas, lo que provocaba diferencias entre el stock registrado y el real, olvidos de entradas o salidas y poca visibilidad de los productos por reponer. PocketTrackKaiju es una app Android que permite consultar productos, registrar movimientos de inventario y ventas, y avisar cuando un producto llega a su stock mínimo, con acceso según el rol de cada persona.
 
