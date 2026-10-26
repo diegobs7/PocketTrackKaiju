@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Cámara: escaneo de códigos de barras/QR y foto del producto (CameraX) -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Notificaciones de stock bajo (permiso en tiempo de ejecución desde Android 13) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
