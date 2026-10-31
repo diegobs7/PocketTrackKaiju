@@ -39,8 +39,6 @@ import com.example.pockettrackkaiju_tea.ui.components.IndicadorStock
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaMovimiento
 import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 
-// Pantalla de detalle: la pueden abrir todos los roles tocando un producto del catálogo.
-// Solo quien puede gestionar productos (administrador) ve el botón "Editar".
 @Composable
 fun PantallaDetalleProducto(
     productoId: Int,
@@ -48,14 +46,12 @@ fun PantallaDetalleProducto(
     puedeEditar: Boolean,
     onEditar: (Producto) -> Unit
 ) {
-    // Se observan las dos listas: si cambia el stock o se registra un movimiento,
-    // la pantalla se redibuja sola.
+
     val productos by viewModel.productos.collectAsStateWithLifecycle()
     val movimientos by viewModel.movimientos.collectAsStateWithLifecycle()
 
     val producto = productos.find { it.id == productoId }
 
-    // Si el producto no existe (por ejemplo, fue eliminado) no hay nada que mostrar.
     if (producto == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
@@ -75,7 +71,6 @@ fun PantallaDetalleProducto(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Foto: si el producto no tiene, se ve el ícono de fondo; si tiene, la foto lo cubre.
         item {
             Box(
                 modifier = Modifier
