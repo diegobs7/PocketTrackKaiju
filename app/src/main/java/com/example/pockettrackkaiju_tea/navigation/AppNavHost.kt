@@ -317,6 +317,22 @@ fun MiNavHost(
                     esAdministrador = rol?.puedeGestionarProductos() == true,
                     onEditar = { producto ->
                         navController.navigate(Rutas.EditarProducto.crearRuta(producto.id))
+                    },
+                    onVerDetalle = { producto ->
+                        navController.navigate(Rutas.DetalleProducto.crearRuta(producto.id))
+                    }
+                )
+            }
+            composable(
+                route = Rutas.DetalleProducto.ruta,
+                arguments = listOf(navArgument("productoId") { type = NavType.IntType })
+            ) { entrada ->
+                PantallaDetalleProducto(
+                    productoId = entrada.arguments?.getInt("productoId") ?: -1,
+                    viewModel = inventarioViewModel,
+                    puedeEditar = rol?.puedeGestionarProductos() == true,
+                    onEditar = { producto ->
+                        navController.navigate(Rutas.EditarProducto.crearRuta(producto.id))
                     }
                 )
             }
