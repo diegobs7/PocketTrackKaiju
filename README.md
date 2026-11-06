@@ -74,7 +74,7 @@ El catálogo parte vacío: entrar como administrador y crear productos con el bo
 
 ## Easter egg: Pokémon sorpresa (API externa)
 
-Función oculta que consume una API REST real para cumplir la actividad 3.1 (DSY1105).
+Función oculta que consume una API REST real.
 
 - **API:** [PokéAPI](https://pokeapi.co/) (pública, sin autenticación).
 - **Endpoint:** `GET https://pokeapi.co/api/v2/pokemon/{nombre o número}`
@@ -93,11 +93,7 @@ Función oculta que consume una API REST real para cumplir la actividad 3.1 (DSY
 | Datos remotos | `PokeApi`, `PokeApiClient`, `PokemonDto` | Retrofit + Gson: petición `GET` y conversión del JSON. |
 
 **Cómo probarlo:**
-1. Abrir la app y tocar 3 veces el logo: aparece un Pokémon.
-2. Buscar `pikachu`: ficha #25, tipo electric.
-3. Dejar el campo vacío y buscar: mensaje que pide un nombre o número.
-4. Buscar `pokemon-inexistente-xyz`: mensaje de no encontrado.
-5. Activar el modo avión, buscar un Pokémon nuevo y luego reactivar internet y presionar **Reintentar**.
-6. Pruebas unitarias: `./gradlew testDebugUnitTest` (`EasterEggViewModelTest`).
+1. Abrir la app y tocar 3 veces el logo del encabezado: aparece un Pokémon.
+2. Buscar `pikachu`o su número #25, u otro pokemon por nombre o número.
 
 ![Pokémon sorpresa](docs/pokemon-sorpresa.jpeg)
