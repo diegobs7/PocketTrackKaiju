@@ -23,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.pockettrackkaiju_tea.R
 import com.example.pockettrackkaiju_tea.ui.theme.PocketTrackKaiju_TEATheme
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.remember
 
 private val FuenteEncabezado = FontFamily(
     Font(R.font.unbounded_semibold, FontWeight.SemiBold),
@@ -30,7 +33,8 @@ private val FuenteEncabezado = FontFamily(
 )
 
 @Composable
-fun EncabezadoKaiju(modifier: Modifier = Modifier) {
+fun EncabezadoKaiju(modifier: Modifier = Modifier,
+                    onToqueLogo: (() -> Unit)? = null) {
     Row(
         modifier = modifier.semantics(mergeDescendants = true) {
             contentDescription = "PocketTrack Kaiju"
@@ -41,7 +45,17 @@ fun EncabezadoKaiju(modifier: Modifier = Modifier) {
         Image(
             painter = painterResource(R.drawable.logo_encabezado),
             contentDescription = null,
-            modifier = Modifier.size(36.dp)
+            modifier = Modifier
+                .size(36.dp)
+                .then(
+                    if (onToqueLogo != null) {
+                        Modifier.clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null, // Sin ondas: el truco no debe verse.
+                            onClick = onToqueLogo
+                        )
+                    } else Modifier
+                )
         )
         Column {
             Text(

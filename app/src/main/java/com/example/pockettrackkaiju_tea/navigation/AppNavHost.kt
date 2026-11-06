@@ -57,13 +57,16 @@ import com.example.pockettrackkaiju_tea.model.puedeGestionarUsuarios
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaUsuarios
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaDetalleProducto
 import com.example.pockettrackkaiju_tea.ui.components.EncabezadoKaiju
+import com.example.pockettrackkaiju_tea.ui.components.DialogoPokemon
+import com.example.pockettrackkaiju_tea.viewmodel.EasterEggViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MiNavHost(
     loginViewModel: LoginViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
     sesionViewModel: SesionViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
-    inventarioViewModel: InventarioViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
+    inventarioViewModel: InventarioViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
+    easterEggViewModel: EasterEggViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
 ) {
     val cargando by sesionViewModel.cargando.collectAsStateWithLifecycle()
     if (cargando) {
@@ -77,6 +80,7 @@ fun MiNavHost(
     val rutaActual = backStackEntry?.destination?.route
     val usuario by sesionViewModel.usuarioActual.collectAsStateWithLifecycle()
     val rol = usuario?.rol
+    val easterEgg by easterEggViewModel.uiState.collectAsStateWithLifecycle()
 
     val contextoActual = LocalContext.current
     val pedirPermisoNotificaciones = rememberLauncherForActivityResult(
@@ -148,11 +152,20 @@ fun MiNavHost(
             }
         )
     }
+    if (easterEgg.visible) {
+        DialogoPokemon(
+            estado = easterEgg,
+            onConsultaChange = easterEggViewModel::actualizarConsulta,
+            onBuscar = easterEggViewModel::buscar,
+            onOtroAleatorio = easterEggViewModel::otroAleatorio,
+            onCerrar = easterEggViewModel::cerrar
+        )
+    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { EncabezadoKaiju() },
+                title = { EncabezadoKaiju(onToqueLogo = easterEggViewModel::registrarToque) },
                 navigationIcon = {
                     if (mostrarBotonAtras) {
                         IconButton(onClick = { navController.popBackStack() }) {
