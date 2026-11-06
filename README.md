@@ -100,4 +100,4 @@ Función oculta que consume una API REST real para cumplir la actividad 3.1 (DSY
 5. Activar el modo avión, buscar un Pokémon nuevo y luego reactivar internet y presionar **Reintentar**.
 6. Pruebas unitarias: `./gradlew testDebugUnitTest` (`EasterEggViewModelTest`).
 
-![Pokémon sorpresa](docs/pokemon-sorpresa.png)
+![Pokémon sorpresa](docs/pokemon-sorpresa.jpeg)
