@@ -71,3 +71,31 @@ El catálogo parte vacío: entrar como administrador y crear productos con el bo
 ## Créditos
 - Tipografía **Unbounded** (solo en el encabezado), © The Unbounded Project Authors, licencia SIL Open Font License 1.1. Ver `LICENCIA_Unbounded_OFL.txt`.
 - Logo de Kaiju Serigrafía, usado con fines académicos.
+
+## Easter egg: Pokémon sorpresa (API externa)
+
+Función oculta que consume una API REST real para cumplir la actividad 3.1 (DSY1105).
+
+- **API:** [PokéAPI](https://pokeapi.co/) (pública, sin autenticación).
+- **Endpoint:** `GET https://pokeapi.co/api/v2/pokemon/{nombre o número}`
+- **Cómo activarlo:** tocar **3 veces seguidas el logo del encabezado** (máximo 1,5 segundos entre un toque y el siguiente). Funciona en cualquier pantalla, incluido el login. Se abre un diálogo con un Pokémon al azar (del 1 al 151).
+- **Qué se puede hacer en el diálogo:** ver la ficha (imagen, tipos, altura y peso), pedir otro Pokémon con **Al azar**, o buscar por nombre o número (por ejemplo `pikachu` o `25`).
+- **Estados:** carga, resultado y error con botón **Reintentar** (no encontrado, sin conexión, respuesta inválida).
+- **Reutilización:** el `PokemonRepository` guarda en memoria las fichas ya consultadas para no repetir peticiones.
+
+**Arquitectura:**
+
+| Capa | Archivo | Responsabilidad |
+|---|---|---|
+| View | `EncabezadoKaiju`, `DialogoPokemon` | Detectar el toque en el logo y dibujar el estado. |
+| ViewModel | `EasterEggViewModel` | Contar los toques, validar la entrada, ejecutar la consulta y publicar `EasterEggUiState`. |
+| Repository | `PokemonRepository` | Normalizar la búsqueda y reutilizar respuestas (caché). |
+| Datos remotos | `PokeApi`, `PokeApiClient`, `PokemonDto` | Retrofit + Gson: petición `GET` y conversión del JSON. |
+
+**Cómo probarlo:**
+1. Abrir la app y tocar 3 veces el logo: aparece un Pokémon.
+2. Buscar `pikachu`: ficha #25, tipo electric.
+3. Dejar el campo vacío y buscar: mensaje que pide un nombre o número.
+4. Buscar `pokemon-inexistente-xyz`: mensaje de no encontrado.
+5. Activar el modo avión, buscar un Pokémon nuevo y luego reactivar internet y presionar **Reintentar**.
+6. Pruebas unitarias: `./gradlew testDebugUnitTest` (`EasterEggViewModelTest`).
