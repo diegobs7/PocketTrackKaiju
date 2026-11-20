@@ -108,7 +108,7 @@ fun MiNavHost(
         Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta
     )
     val rutasConBotonAtras = listOf(
-        Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta
+        Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta, Rutas.DetalleProducto.ruta
     )
     val mostrarBotonAtras = rutaActual in rutasConBotonAtras
     val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
