@@ -30,7 +30,7 @@ class MovimientoViewModelTest {
     @Before
     fun preparar() {
         productoDao = FakeProductoDao()
-        movimientoDao = FakeMovimientoDao()
+        movimientoDao = FakeMovimientoDao(productoDao)
         // Producto con stock 10 para todos los tests.
         producto = productoDao.agregarDirecto(productoDePrueba("KAI-001", stockActual = 10))
         viewModel = MovimientoViewModel(

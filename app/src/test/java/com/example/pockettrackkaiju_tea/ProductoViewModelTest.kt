@@ -224,4 +224,27 @@ class ProductoViewModelTest {
 
         assertFalse(viewModel.guardarCambios())
     }
+    @Test
+    fun noSePuedeTomarFotoSinCodigo() {
+        assertFalse(viewModel.puedeTomarFoto())
+        assertNotNull(viewModel.estadoFormulario.value.errores.errorFoto)
+    }
+
+    @Test
+    fun alIngresarElCodigoSeLimpiaElAvisoYSePuedeTomarFoto() {
+        viewModel.puedeTomarFoto()
+        viewModel.actualizarCodigo("KAI-100")
+
+        assertNull(viewModel.estadoFormulario.value.errores.errorFoto)
+        assertTrue(viewModel.puedeTomarFoto())
+    }
+    @Test
+    fun alEscribirEnUnCampoSeQuitaSoloSuError() {
+        viewModel.validarFormulario()
+        viewModel.actualizarNombre("Polera")
+
+        val errores = viewModel.estadoFormulario.value.errores
+        assertNull(errores.errorNombre)
+        assertNotNull(errores.errorCodigo)
+    }
 }

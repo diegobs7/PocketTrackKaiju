@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.viewmodel.RegistroUsuarioViewModel
 import androidx.compose.ui.text.input.ImeAction
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
+import com.example.pockettrackkaiju_tea.ui.components.TextoApoyoCampo
 
 
 @Composable
@@ -55,7 +56,7 @@ fun PantallaRegistroUsuario(
             onValueChange = viewModel::actualizarNombre,
             label = { Text("Nombre") },
             isError = estado.errores.errorNombre != null,
-            supportingText = { estado.errores.errorNombre?.let { Text(it) } },
+            supportingText = { TextoApoyoCampo(estado.errores.errorNombre) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
@@ -68,7 +69,7 @@ fun PantallaRegistroUsuario(
             onValueChange = viewModel::actualizarEmail,
             label = { Text("Correo electrónico") },
             isError = estado.errores.errorEmail != null,
-            supportingText = { estado.errores.errorEmail?.let { Text(it) } },
+            supportingText = { TextoApoyoCampo(estado.errores.errorEmail) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
@@ -81,7 +82,7 @@ fun PantallaRegistroUsuario(
             onValueChange = viewModel::actualizarPassword,
             label = { Text("Contraseña") },
             isError = estado.errores.errorPassword != null,
-            supportingText = { estado.errores.errorPassword?.let { Text(it) } },
+            supportingText = { TextoApoyoCampo(estado.errores.errorPassword) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
             singleLine = true,
@@ -95,7 +96,7 @@ fun PantallaRegistroUsuario(
             onValueChange = viewModel::actualizarConfirmarPassword,
             label = { Text("Confirmar contraseña") },
             isError = estado.errores.errorConfirmarPassword != null,
-            supportingText = { estado.errores.errorConfirmarPassword?.let { Text(it) } },
+            supportingText = { TextoApoyoCampo(estado.errores.errorConfirmarPassword) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { intentarRegistrar() }),

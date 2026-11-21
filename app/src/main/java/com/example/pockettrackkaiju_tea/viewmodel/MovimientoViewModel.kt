@@ -36,10 +36,22 @@ class MovimientoViewModel(
     val productos: StateFlow<List<Producto>> = productoRepository.productos
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun seleccionarProducto(valor: Producto) = _estadoFormulario.update { it.copy(producto = valor) }
-    fun seleccionarTipo(valor: TipoMovimiento) = _estadoFormulario.update { it.copy(tipo = valor) }
-    fun actualizarCantidad(valor: String) = _estadoFormulario.update { it.copy(cantidad = valor) }
-    fun actualizarMotivo(valor: String) = _estadoFormulario.update { it.copy(motivo = valor) }
+    fun seleccionarProducto(valor: Producto) = _estadoFormulario.update {
+        it.copy(producto = valor, errores = it.errores.copy(errorProducto = null, errorCantidad = null))
+    }
+
+    fun limpiarProducto() = _estadoFormulario.update {
+        it.copy(producto = null, errores = it.errores.copy(errorProducto = null))
+    }
+    fun seleccionarTipo(valor: TipoMovimiento) = _estadoFormulario.update {
+        it.copy(tipo = valor, errores = it.errores.copy(errorTipo = null, errorCantidad = null))
+    }
+    fun actualizarCantidad(valor: String) = _estadoFormulario.update {
+        it.copy(cantidad = valor, errores = it.errores.copy(errorCantidad = null))
+    }
+    fun actualizarMotivo(valor: String) = _estadoFormulario.update {
+        it.copy(motivo = valor, errores = it.errores.copy(errorMotivo = null))
+    }
 
     fun validarFormulario(): Boolean {
         val estado = _estadoFormulario.value
@@ -96,9 +108,7 @@ class MovimientoViewModel(
 
         viewModelScope.launch {
             val productoActualizado = productoActual.copy(stockActual = nuevoStock)
-            movimientoRepository.guardar(movimiento)
-            productoRepository.actualizar(productoActualizado)
-            // Avisa si el producto quedó con stock bajo (o quita el aviso si se repuso).
+            movimientoRepository.registrarConStock(movimiento, productoActualizado)
             contexto?.let { NotificacionesStock.revisar(it, productoActualizado) }
         }
 
