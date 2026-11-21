@@ -31,15 +31,44 @@ class ProductoViewModel(
     private val productos: StateFlow<List<Producto>> = repository.productos
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    fun actualizarCodigo(valor: String) = _estadoFormulario.update { it.copy(codigo = valor) }
-    fun actualizarNombre(valor: String) = _estadoFormulario.update { it.copy(nombre = valor) }
-    fun actualizarDescripcion(valor: String) = _estadoFormulario.update { it.copy(descripcion = valor) }
-    fun actualizarCategoria(valor: String) = _estadoFormulario.update { it.copy(categoria = valor) }
-    fun actualizarTipo(valor: String) = _estadoFormulario.update { it.copy(tipo = valor) }
-    fun actualizarPrecio(valor: String) = _estadoFormulario.update { it.copy(precio = valor) }
-    fun actualizarStockActual(valor: String) = _estadoFormulario.update { it.copy(stockActual = valor) }
+    fun actualizarCodigo(valor: String) = _estadoFormulario.update {
+        it.copy(codigo = valor, errores = it.errores.copy(errorCodigo = null, errorFoto = null))
+    }
+    fun actualizarNombre(valor: String) = _estadoFormulario.update {
+        it.copy(nombre = valor, errores = it.errores.copy(errorNombre = null))
+    }
+    fun actualizarDescripcion(valor: String) = _estadoFormulario.update {
+        it.copy(descripcion = valor, errores = it.errores.copy(errorDescripcion = null))
+    }
+    fun actualizarCategoria(valor: String) = _estadoFormulario.update {
+        it.copy(categoria = valor, errores = it.errores.copy(errorCategoria = null))
+    }
+    fun actualizarTipo(valor: String) = _estadoFormulario.update {
+        it.copy(tipo = valor, errores = it.errores.copy(errorTipo = null))
+    }
+    fun actualizarPrecio(valor: String) = _estadoFormulario.update {
+        it.copy(precio = valor, errores = it.errores.copy(errorPrecio = null))
+    }
+    fun actualizarStockActual(valor: String) = _estadoFormulario.update {
+        it.copy(stockActual = valor, errores = it.errores.copy(errorStockActual = null))
+    }
     fun actualizarDetalle(valor: String) = _estadoFormulario.update { it.copy(detalle = valor) }
-    fun actualizarStockMinimo(valor: String) = _estadoFormulario.update { it.copy(stockMinimo = valor) }
+    fun actualizarStockMinimo(valor: String) = _estadoFormulario.update {
+        it.copy(stockMinimo = valor, errores = it.errores.copy(errorStockMinimo = null))
+    }
+
+    fun puedeTomarFoto(): Boolean {
+        val hayCodigo = _estadoFormulario.value.codigo.isNotBlank()
+        _estadoFormulario.update {
+            it.copy(
+                errores = it.errores.copy(
+                    errorFoto = if (hayCodigo) null
+                    else "Ingresa o escanea el código antes de tomar la foto."
+                )
+            )
+        }
+        return hayCodigo
+    }
 
     fun validarFormulario(): Boolean {
         val estado = _estadoFormulario.value

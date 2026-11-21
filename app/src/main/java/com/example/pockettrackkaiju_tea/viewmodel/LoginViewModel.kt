@@ -22,8 +22,12 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
         viewModelScope.launch { repository.cargarUsuariosDePrueba() }
     }
 
-    fun actualizarEmail(valor: String) = _estadoFormulario.update { it.copy(email = valor) }
-    fun actualizarPassword(valor: String) = _estadoFormulario.update { it.copy(password = valor) }
+    fun actualizarEmail(valor: String) = _estadoFormulario.update {
+        it.copy(email = valor, errores = it.errores.copy(errorEmail = null))
+    }
+    fun actualizarPassword(valor: String) = _estadoFormulario.update {
+        it.copy(password = valor, errores = it.errores.copy(errorPassword = null))
+    }
     fun actualizarRecordarme(valor: Boolean) = _estadoFormulario.update { it.copy(recordarme = valor) }
 
     fun validarFormulario(): Boolean {

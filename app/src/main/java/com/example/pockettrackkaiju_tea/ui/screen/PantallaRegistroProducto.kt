@@ -56,6 +56,8 @@ import com.example.pockettrackkaiju_tea.model.TipoProducto
 import com.example.pockettrackkaiju_tea.ui.components.CamaraNativa
 import com.example.pockettrackkaiju_tea.ui.components.FotoProducto
 import com.example.pockettrackkaiju_tea.ui.components.ModoCamara
+import com.example.pockettrackkaiju_tea.ui.components.OpcionMenu
+import com.example.pockettrackkaiju_tea.ui.components.TextoApoyoCampo
 import com.example.pockettrackkaiju_tea.util.FotosProducto
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.ProductoViewModel
@@ -85,7 +87,6 @@ fun PantallaRegistroProducto(
     val contexto = LocalContext.current
     var modoCamara by remember { mutableStateOf<ModoCamara?>(null) }
     var versionFoto by remember { mutableStateOf(0) }
-    var avisoCamara by remember { mutableStateOf<String?>(null) }
 
     val intentarRegistrar: () -> Unit = {
         val exito = if (esEdicion) viewModel.guardarCambios() else viewModel.crearProducto()
@@ -98,7 +99,6 @@ fun PantallaRegistroProducto(
             onCerrar = { modoCamara = null },
             onCodigoEscaneado = { codigo ->
                 viewModel.actualizarCodigo(codigo.trim())
-                avisoCamara = null
                 modoCamara = null
             },
             archivoDestino = FotosProducto.archivo(contexto, estado.codigo),
@@ -133,9 +133,10 @@ fun PantallaRegistroProducto(
                 isError = estado.errores.errorCodigo != null,
                 readOnly = esEdicion,
                 supportingText = {
-                    val mensaje = estado.errores.errorCodigo
-                        ?: if (esEdicion) "El código no se puede cambiar." else null
-                    mensaje?.let { Text(it) }
+                    TextoApoyoCampo(
+                        error = estado.errores.errorCodigo,
+                        ayuda = if (esEdicion) "El código no se puede cambiar." else null
+                    )
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 singleLine = true,
@@ -148,7 +149,7 @@ fun PantallaRegistroProducto(
             ) {
                 if (!esEdicion) {
                     OutlinedButton(
-                        onClick = { avisoCamara = null; modoCamara = ModoCamara.ESCANEAR_CODIGO },
+                        onClick = { modoCamara = ModoCamara.ESCANEAR_CODIGO },
                         modifier = Modifier.weight(1f)
                     ) {
                         Icon(Icons.Filled.QrCodeScanner, contentDescription = null)
@@ -157,14 +158,7 @@ fun PantallaRegistroProducto(
                     }
                 }
                 OutlinedButton(
-                    onClick = {
-                        if (estado.codigo.isBlank()) {
-                            avisoCamara = "Ingresa o escanea el código antes de tomar la foto."
-                        } else {
-                            avisoCamara = null
-                            modoCamara = ModoCamara.TOMAR_FOTO
-                        }
-                    },
+                    onClick = { if (viewModel.puedeTomarFoto()) modoCamara = ModoCamara.TOMAR_FOTO },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Filled.CameraAlt, contentDescription = null)
@@ -172,9 +166,7 @@ fun PantallaRegistroProducto(
                     Text("Tomar foto")
                 }
             }
-            avisoCamara?.let {
-                Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
-            }
+            estado.errores.errorFoto?.let { TextoApoyoCampo(error = it) }
             FotoProducto(
                 codigo = estado.codigo,
                 version = versionFoto,
@@ -189,7 +181,7 @@ fun PantallaRegistroProducto(
                 onValueChange = viewModel::actualizarNombre,
                 label = { Text("Nombre") },
                 isError = estado.errores.errorNombre != null,
-                supportingText = { estado.errores.errorNombre?.let { Text(it) } },
+                supportingText = { TextoApoyoCampo(estado.errores.errorNombre) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Next
@@ -203,7 +195,7 @@ fun PantallaRegistroProducto(
                 onValueChange = viewModel::actualizarDescripcion,
                 label = { Text("Descripción") },
                 isError = estado.errores.errorDescripcion != null,
-                supportingText = { estado.errores.errorDescripcion?.let { Text(it) } },
+                supportingText = { TextoApoyoCampo(estado.errores.errorDescripcion) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Next
@@ -224,7 +216,7 @@ fun PantallaRegistroProducto(
                     readOnly = true,
                     label = { Text("Categoría (Colección)") },
                     isError = estado.errores.errorCategoria != null,
-                    supportingText = { estado.errores.errorCategoria?.let { Text(it) } },
+                    supportingText = { TextoApoyoCampo(estado.errores.errorCategoria) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuCategoriaExpandido)
                     },
@@ -239,8 +231,9 @@ fun PantallaRegistroProducto(
                     onDismissRequest = { menuCategoriaExpandido = false }
                 ) {
                     CategoriaProducto.entries.forEach { categoria ->
-                        DropdownMenuItem(
-                            text = { Text(categoria.displayName) },
+                        OpcionMenu(
+                            texto = categoria.displayName,
+                            seleccionada = estado.categoria == categoria.displayName,
                             onClick = {
                                 viewModel.actualizarCategoria(categoria.displayName)
                                 menuCategoriaExpandido = false
@@ -261,7 +254,7 @@ fun PantallaRegistroProducto(
                     readOnly = true,
                     label = { Text("Tipo de Prenda") },
                     isError = estado.errores.errorTipo != null,
-                    supportingText = { estado.errores.errorTipo?.let { Text(it) } },
+                    supportingText = { TextoApoyoCampo(estado.errores.errorTipo) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuTipoExpandido)
                     },
@@ -276,8 +269,9 @@ fun PantallaRegistroProducto(
                     onDismissRequest = { menuTipoExpandido = false }
                 ) {
                     TipoProducto.entries.forEach { tipo ->
-                        DropdownMenuItem(
-                            text = { Text(tipo.displayName) },
+                        OpcionMenu(
+                            texto = tipo.displayName,
+                            seleccionada = estado.tipo == tipo.displayName,
                             onClick = {
                                 viewModel.actualizarTipo(tipo.displayName)
                                 menuTipoExpandido = false
@@ -293,7 +287,7 @@ fun PantallaRegistroProducto(
                 label = { Text("Precio") },
                 prefix = { Text("$") },
                 isError = estado.errores.errorPrecio != null,
-                supportingText = { estado.errores.errorPrecio?.let { Text(it) } },
+                supportingText = { TextoApoyoCampo(estado.errores.errorPrecio) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next
@@ -309,9 +303,10 @@ fun PantallaRegistroProducto(
                 isError = estado.errores.errorStockActual != null,
                 readOnly = esEdicion,
                 supportingText = {
-                    val mensaje = estado.errores.errorStockActual
-                        ?: if (esEdicion) "El stock solo cambia con movimientos." else null
-                    mensaje?.let { Text(it) }
+                    TextoApoyoCampo(
+                        error = estado.errores.errorStockActual,
+                        ayuda = if (esEdicion) "El stock solo cambia con movimientos." else null
+                    )
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
@@ -326,9 +321,9 @@ fun PantallaRegistroProducto(
                 label = { Text("Stock mínimo") },
                 isError = estado.errores.errorStockMinimo != null,
                 supportingText = {
-                    Text(
-                        estado.errores.errorStockMinimo
-                            ?: "Se mostrará una alerta cuando el stock llegue a este número."
+                    TextoApoyoCampo(
+                        error = estado.errores.errorStockMinimo,
+                        ayuda = "Se mostrará una alerta cuando el stock llegue a este número."
                     )
                 },
                 keyboardOptions = KeyboardOptions(

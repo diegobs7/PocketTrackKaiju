@@ -80,7 +80,9 @@ class FakeUsuarioDao : UsuarioDao {
     }
 }
 
-class FakeMovimientoDao : MovimientoDao {
+class FakeMovimientoDao(
+    private val productoDao: FakeProductoDao? = null
+): MovimientoDao {
     private val tabla = MutableStateFlow<List<Movimiento>>(emptyList())
     private var siguienteId = 1
 
@@ -100,6 +102,10 @@ class FakeMovimientoDao : MovimientoDao {
     override suspend fun insertar(movimiento: Movimiento) {
         agregarDirecto(movimiento)
     }
+    override suspend fun actualizarProducto(producto: Producto) {
+        productoDao?.actualizar(producto)
+    }
+
 }
 
 // ---- Datos de ejemplo para armar escenarios de prueba ----

@@ -56,6 +56,8 @@ import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.MovimientoViewModel
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
+import com.example.pockettrackkaiju_tea.ui.components.TextoApoyoCampo
+import com.example.pockettrackkaiju_tea.ui.components.OpcionMenu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,15 +127,16 @@ fun PantallaMovimiento(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value = estado.producto?.let { "${it.codigo} - ${it.nombre}" } ?: "",
+                    value = estado.producto?.let { "${it.codigo} - ${it.nombre}" } ?: "Sin producto seleccionado",
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("Producto") },
                     isError = estado.errores.errorProducto != null,
                     supportingText = {
-                        val mensaje = estado.errores.errorProducto
-                            ?: stockActual?.let { "Stock actual: $it" }
-                        mensaje?.let { Text(it) }
+                        TextoApoyoCampo(
+                            error = estado.errores.errorProducto,
+                            ayuda = stockActual?.let { "Stock actual: $it" }
+                        )
                     },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuProductoExpandido)
@@ -148,9 +151,19 @@ fun PantallaMovimiento(
                     expanded = menuProductoExpandido,
                     onDismissRequest = { menuProductoExpandido = false }
                 ) {
-                    productos.forEach { producto ->
+                    if (estado.producto != null) {
                         DropdownMenuItem(
-                            text = { Text("${producto.codigo} - ${producto.nombre}") },
+                            text = { Text("Sin producto") },
+                            onClick = {
+                                viewModel.limpiarProducto()
+                                menuProductoExpandido = false
+                            }
+                        )
+                    }
+                    productos.forEach { producto ->
+                        OpcionMenu(
+                            texto = "${producto.codigo} - ${producto.nombre}",
+                            seleccionada = estado.producto?.id == producto.id,
                             onClick = {
                                 viewModel.seleccionarProducto(producto)
                                 menuProductoExpandido = false
@@ -184,7 +197,7 @@ fun PantallaMovimiento(
                     readOnly = true,
                     label = { Text("Tipo de movimiento") },
                     isError = estado.errores.errorTipo != null,
-                    supportingText = { estado.errores.errorTipo?.let { Text(it) } },
+                    supportingText = { TextoApoyoCampo(estado.errores.errorTipo) },
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuTipoExpandido)
                     },
@@ -199,8 +212,9 @@ fun PantallaMovimiento(
                     onDismissRequest = { menuTipoExpandido = false }
                 ) {
                     usuario.rol.tiposDeMovimientoPermitidos().forEach { tipo ->
-                        DropdownMenuItem(
-                            text = { Text(etiquetaTipo(tipo)) },
+                        OpcionMenu(
+                            texto = etiquetaTipo(tipo),
+                            seleccionada = estado.tipo == tipo,
                             onClick = {
                                 viewModel.seleccionarTipo(tipo)
                                 menuTipoExpandido = false
@@ -215,7 +229,7 @@ fun PantallaMovimiento(
                 onValueChange = viewModel::actualizarCantidad,
                 label = { Text("Cantidad") },
                 isError = estado.errores.errorCantidad != null,
-                supportingText = { estado.errores.errorCantidad?.let { Text(it) } },
+                supportingText = { TextoApoyoCampo(estado.errores.errorCantidad) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next
@@ -229,7 +243,7 @@ fun PantallaMovimiento(
                 onValueChange = viewModel::actualizarMotivo,
                 label = { Text("Motivo") },
                 isError = estado.errores.errorMotivo != null,
-                supportingText = { estado.errores.errorMotivo?.let { Text(it) } },
+                supportingText = { TextoApoyoCampo(estado.errores.errorMotivo) },
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Next

@@ -29,10 +29,21 @@ class RegistroUsuarioViewModel(
         viewModelScope.launch { repository.cargarUsuariosDePrueba() }
     }
 
-    fun actualizarNombre(valor: String) = _estadoFormulario.update { it.copy(nombre = valor) }
-    fun actualizarEmail(valor: String) = _estadoFormulario.update { it.copy(email = valor) }
-    fun actualizarPassword(valor: String) = _estadoFormulario.update { it.copy(password = valor) }
-    fun actualizarConfirmarPassword(valor: String) = _estadoFormulario.update { it.copy(confirmarPassword = valor) }
+    fun actualizarNombre(valor: String) = _estadoFormulario.update {
+        it.copy(nombre = valor, errores = it.errores.copy(errorNombre = null))
+    }
+    fun actualizarEmail(valor: String) = _estadoFormulario.update {
+        it.copy(email = valor, errores = it.errores.copy(errorEmail = null))
+    }
+    fun actualizarPassword(valor: String) = _estadoFormulario.update {
+        it.copy(
+            password = valor,
+            errores = it.errores.copy(errorPassword = null, errorConfirmarPassword = null)
+        )
+    }
+    fun actualizarConfirmarPassword(valor: String) = _estadoFormulario.update {
+        it.copy(confirmarPassword = valor, errores = it.errores.copy(errorConfirmarPassword = null))
+    }
 
     fun validarFormulario(): Boolean {
         val estado = _estadoFormulario.value

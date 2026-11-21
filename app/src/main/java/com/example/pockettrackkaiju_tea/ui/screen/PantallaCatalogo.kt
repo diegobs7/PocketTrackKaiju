@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -39,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pockettrackkaiju_tea.model.CategoriaProducto
 import com.example.pockettrackkaiju_tea.model.Producto
 import com.example.pockettrackkaiju_tea.ui.components.DialogoEliminarProducto
+import com.example.pockettrackkaiju_tea.ui.components.OpcionMenu
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaProducto
 import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 
@@ -155,8 +155,9 @@ fun PantallaCatalogo(
                     expanded = menuCategoriaExpandido,
                     onDismissRequest = { menuCategoriaExpandido = false }
                 ) {
-                    DropdownMenuItem(
-                        text = { Text("Todas las categorías") },
+                    OpcionMenu(
+                        texto = "Todas las categorías",
+                        seleccionada = categoriaSeleccionada == null,
                         onClick = {
                             categoriaSeleccionada = null
                             menuCategoriaExpandido = false
@@ -164,8 +165,9 @@ fun PantallaCatalogo(
                     )
 
                     CategoriaProducto.entries.forEach { categoria ->
-                        DropdownMenuItem(
-                            text = { Text(categoria.displayName) },
+                        OpcionMenu(
+                            texto = categoria.displayName,
+                            seleccionada = categoriaSeleccionada == categoria,
                             onClick = {
                                 categoriaSeleccionada = categoria
                                 menuCategoriaExpandido = false
