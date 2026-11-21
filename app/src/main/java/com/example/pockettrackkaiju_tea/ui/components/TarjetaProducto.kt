@@ -12,21 +12,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.example.pockettrackkaiju_tea.model.CategoriaProducto
 import com.example.pockettrackkaiju_tea.model.Producto
-import com.example.pockettrackkaiju_tea.model.TipoProducto
-import com.example.pockettrackkaiju_tea.ui.theme.PocketTrackKaiju_TEATheme
 
 @Composable
 fun TarjetaProducto(
     producto: Producto,
     enAlerta: Boolean,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onEditar: (() -> Unit)? = null,
+    onEliminar: (() -> Unit)? = null
 ) {
     Card(
         onClick = onClick,
@@ -72,6 +72,23 @@ fun TarjetaProducto(
                 )
                 IndicadorStock(stockActual = producto.stockActual, enAlerta = enAlerta)
             }
+
+            if(onEditar != null || onEliminar != null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    onEditar?.let {
+                        TextButton(onClick = it) {
+                            Text("Editar") }
+                    }
+                    onEliminar?.let {
+                        TextButton(onClick = it) {
+                            Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -80,23 +97,3 @@ fun TarjetaProducto(
 private fun formatearPrecio(precio: Int): String =
     "$" + "%,d".format(precio).replace(',', '.')
 
-@Composable
-fun PreviewTarjetaProducto() {
-    val ejemplo = Producto(
-        codigo = "KAI-008",
-        nombre = "Polera Sin Mangas Evangelion",
-        descripcion = "Polera sin mangas ideal para verano, diseño EVA-01",
-        categoria = CategoriaProducto.ANIME,
-        tipo = TipoProducto.POLERA_SIN_MANGAS,
-        precio = 14990,
-        stockActual = 6,
-        stockMinimo = 8,
-        detalle = null
-    )
-    PocketTrackKaiju_TEATheme {
-        Column {
-            TarjetaProducto(producto = ejemplo, enAlerta = false)
-            TarjetaProducto(producto = ejemplo.copy(stockActual = 2), enAlerta = true)
-        }
-    }
-}

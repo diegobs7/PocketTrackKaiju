@@ -104,11 +104,16 @@ fun MiNavHost(
     }
 
     val rutasSinBarra = listOf(
-        Rutas.InicioSesion.ruta, Rutas.RegistroUsuario.ruta,
-        Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta
+        Rutas.InicioSesion.ruta,
+        Rutas.RegistroUsuario.ruta,
+        Rutas.RegistroProducto.ruta,
+        Rutas.EditarProducto.ruta
     )
     val rutasConBotonAtras = listOf(
-        Rutas.RegistroUsuario.ruta, Rutas.RegistroProducto.ruta, Rutas.EditarProducto.ruta, Rutas.DetalleProducto.ruta
+        Rutas.RegistroUsuario.ruta,
+        Rutas.RegistroProducto.ruta,
+        Rutas.EditarProducto.ruta,
+        Rutas.DetalleProducto.ruta
     )
     val mostrarBotonAtras = rutaActual in rutasConBotonAtras
     val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
@@ -281,6 +286,10 @@ fun MiNavHost(
             navController = navController,
             startDestination = destinoInicial,
             modifier = Modifier.padding(padding),
+            enterTransition = TransicionesNavegacion.entrar,
+            exitTransition = TransicionesNavegacion.salir,
+            popEnterTransition = TransicionesNavegacion.volverEntrar,
+            popExitTransition = TransicionesNavegacion.volverSalir
         ) {
             composable(route = Rutas.InicioSesion.ruta) {
                 PantallaInicioSesion(
@@ -344,7 +353,11 @@ fun MiNavHost(
             }
             composable(Rutas.RegistroProducto.ruta) {
                 PantallaRegistroProducto(
-                    onRegistroExitoso = { navController.popBackStack() }
+                    onRegistroExitoso = {
+                        if (!navController.popBackStack(Rutas.Catalogo.ruta, inclusive = false)) {
+                            navegarAPestana(Rutas.Catalogo.ruta)
+                        }
+                    }
                 )
             }
             composable(Rutas.Usuarios.ruta) {

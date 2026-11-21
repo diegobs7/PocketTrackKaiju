@@ -26,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -181,7 +180,7 @@ fun PantallaCatalogo(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 70.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if (productosFiltrados.isEmpty()) {
@@ -197,26 +196,13 @@ fun PantallaCatalogo(
                 }
             } else {
                 items(productosFiltrados, key = { it.codigo }) { producto ->
-                    Column {
-                        TarjetaProducto(
-                            producto = producto,
-                            enAlerta = viewModel.estaEnAlerta(producto),
-                            onClick = { onVerDetalle(producto) }
-                        )
-                        if (esAdministrador) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                TextButton(onClick = { onEditar(producto) }) {
-                                    Text("Editar")
-                                }
-                                TextButton(onClick = { productoAEliminar = producto }) {
-                                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
-                                }
-                            }
-                        }
-                    }
+                    TarjetaProducto(
+                        producto = producto,
+                        enAlerta = viewModel.estaEnAlerta(producto),
+                        onClick = { onVerDetalle(producto) },
+                        onEditar = if (esAdministrador) ({ onEditar(producto) }) else null,
+                        onEliminar = if (esAdministrador) ({ productoAEliminar = producto }) else null
+                    )
                 }
             }
         }
