@@ -5,6 +5,7 @@ data class FormularioRegistroUsuario(
     val email: String = "",
     val password: String = "",
     val confirmarPassword: String = "",
+    val rol: Rol = Rol.VENDEDOR,
     val cargando: Boolean = false,
     val errores: ErroresRegistroUsuario = ErroresRegistroUsuario()
 )

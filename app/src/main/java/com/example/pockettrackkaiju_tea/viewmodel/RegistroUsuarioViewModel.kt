@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pockettrackkaiju_tea.model.ErroresRegistroUsuario
 import com.example.pockettrackkaiju_tea.model.FormularioRegistroUsuario
+import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.remote.ErrorBackend
 import com.example.pockettrackkaiju_tea.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +35,7 @@ class RegistroUsuarioViewModel(
     fun actualizarConfirmarPassword(valor: String) = _estadoFormulario.update {
         it.copy(confirmarPassword = valor, errores = it.errores.copy(errorConfirmarPassword = null))
     }
+    fun actualizarRol(valor: Rol) = _estadoFormulario.update { it.copy(rol = valor) }
 
     fun validarFormulario(): Boolean {
         val estado = _estadoFormulario.value
@@ -75,15 +77,25 @@ class RegistroUsuarioViewModel(
         return errorNombre == null && errorEmail == null && errorPassword == null && errorConfirmarPassword == null
     }
 
-    fun registrarUsuario(onExito: () -> Unit) {
+    /**
+     * @param conRol false: registro público, el servidor asigna VENDEDOR.
+     * true: un administrador crea el usuario con el rol elegido en el formulario.
+     */
+    fun registrarUsuario(conRol: Boolean = false, onExito: () -> Unit) {
         if (_estadoFormulario.value.cargando) return
         if (!validarFormulario()) return
 
         val estado = _estadoFormulario.value
+        val nombre = estado.nombre.trim()
+        val correo = estado.email.trim().lowercase()
         _estadoFormulario.update { it.copy(cargando = true) }
         viewModelScope.launch {
             try {
-                repository.registrar(estado.nombre.trim(), estado.email.trim().lowercase(), estado.password)
+                if (conRol) {
+                    repository.crear(nombre, correo, estado.password, estado.rol)
+                } else {
+                    repository.registrar(nombre, correo, estado.password)
+                }
                 _estadoFormulario.value = FormularioRegistroUsuario()
                 onExito()
             } catch (e: ErrorBackend) {
@@ -100,6 +112,7 @@ class RegistroUsuarioViewModel(
     ): ErroresRegistroUsuario = when {
         e.esCorreoRepetido -> actuales.copy(errorEmail = "Ya existe una cuenta con ese correo.")
         e.esSinConexion -> actuales.copy(errorConfirmarPassword = "No se pudo conectar con el servidor.")
+        e.esSinPermiso -> actuales.copy(errorConfirmarPassword = "No tienes permiso para crear usuarios.")
         else -> actuales.copy(errorConfirmarPassword = e.message ?: "No se pudo registrar la cuenta.")
     }
 

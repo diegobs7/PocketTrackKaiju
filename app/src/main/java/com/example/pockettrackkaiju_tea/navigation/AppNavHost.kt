@@ -106,15 +106,18 @@ fun MiNavHost(
     val rutasSinBarra = listOf(
         Rutas.InicioSesion.ruta,
         Rutas.RegistroUsuario.ruta,
+        Rutas.CrearUsuario.ruta,
         Rutas.RegistroProducto.ruta,
         Rutas.EditarProducto.ruta
     )
     val rutasConBotonAtras = listOf(
         Rutas.RegistroUsuario.ruta,
+        Rutas.CrearUsuario.ruta,
         Rutas.RegistroProducto.ruta,
         Rutas.EditarProducto.ruta,
         Rutas.DetalleProducto.ruta
     )
+
     val mostrarBotonAtras = rutaActual in rutasConBotonAtras
     val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
 
@@ -278,6 +281,12 @@ fun MiNavHost(
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "Agregar Producto")
                 }
+            } else if (rutaActual == Rutas.Usuarios.ruta && rol?.puedeGestionarUsuarios() == true) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(Rutas.CrearUsuario.ruta) }
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = "Crear usuario")
+                }
             }
         }
     ) { padding ->
@@ -305,6 +314,12 @@ fun MiNavHost(
             }
             composable(Rutas.RegistroUsuario.ruta) {
                 PantallaRegistroUsuario(
+                    onRegistroExitoso = { navController.popBackStack() }
+                )
+            }
+            composable(Rutas.CrearUsuario.ruta) {
+                PantallaRegistroUsuario(
+                    conSelectorDeRol = true,
                     onRegistroExitoso = { navController.popBackStack() }
                 )
             }

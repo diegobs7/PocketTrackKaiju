@@ -172,4 +172,41 @@ class RegistroUsuarioViewModelTest {
         assertEquals("", viewModel.estadoFormulario.value.nombre)
         assertEquals("", viewModel.estadoFormulario.value.email)
     }
+    @Test
+    fun crearConRolGuardaElRolElegido() {
+        completarFormularioValido()
+        viewModel.actualizarRol(Rol.ENCARGADO_INVENTARIO)
+
+        var creado = false
+        viewModel.registrarUsuario(conRol = true) { creado = true }
+
+        assertTrue(creado)
+        val nuevo = runBlocking { repositorio.listar() }.last()
+        assertEquals("camila@kaiju.cl", nuevo.correo)
+        assertEquals(Rol.ENCARGADO_INVENTARIO, nuevo.rol)
+    }
+
+    @Test
+    fun elRegistroPublicoIgnoraElRolYDejaVendedor() {
+        // Sin conRol (registro desde el login), nadie puede elegirse un rol mejor.
+        completarFormularioValido()
+        viewModel.actualizarRol(Rol.ADMINISTRADOR)
+
+        viewModel.registrarUsuario { }
+
+        assertEquals(Rol.VENDEDOR, runBlocking { repositorio.listar() }.last().rol)
+    }
+
+    @Test
+    fun crearConRolConCorreoRepetidoMuestraErrorYNoGuarda() {
+        completarFormularioValido(email = "thomas@kaiju.cl")
+        viewModel.actualizarRol(Rol.ADMINISTRADOR)
+
+        var creado = false
+        viewModel.registrarUsuario(conRol = true) { creado = true }
+
+        assertFalse(creado)
+        assertNotNull(viewModel.estadoFormulario.value.errores.errorEmail)
+        assertEquals(3, runBlocking { repositorio.listar() }.size)
+    }
 }

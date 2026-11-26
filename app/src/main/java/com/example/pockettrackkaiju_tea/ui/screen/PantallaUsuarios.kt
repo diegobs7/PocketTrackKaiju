@@ -23,6 +23,8 @@ import com.example.pockettrackkaiju_tea.ui.components.DialogoEliminarUsuario
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaUsuario
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.UsuariosViewModel
+import com.example.pockettrackkaiju_tea.ui.components.BannerError
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun PantallaUsuarios(
@@ -30,8 +32,10 @@ fun PantallaUsuarios(
     viewModel: UsuariosViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
 ) {
     val usuarios by viewModel.usuarios.collectAsStateWithLifecycle()
+    val error by viewModel.error.collectAsStateWithLifecycle()
     var usuarioAEditar by remember { mutableStateOf<Usuario?>(null) }
     var usuarioAEliminar by remember { mutableStateOf<Usuario?>(null) }
+    LaunchedEffect(Unit) { viewModel.cargarUsuarios() }
 
     usuarioAEditar?.let { usuario ->
         DialogoCambiarRol(
@@ -58,7 +62,7 @@ fun PantallaUsuarios(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 80.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
@@ -66,6 +70,11 @@ fun PantallaUsuarios(
                 text = "Usuarios registrados: ${usuarios.size}",
                 style = MaterialTheme.typography.titleMedium
             )
+        }
+        item {
+            error?.let { mensaje ->
+                BannerError(mensaje = mensaje, onCerrar = viewModel::limpiarError)
+            }
         }
         items(usuarios, key = { it.id }) { usuario ->
             TarjetaUsuario(
