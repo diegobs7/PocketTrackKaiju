@@ -41,18 +41,30 @@ class UsuariosViewModel(
     fun tieneMovimientos(usuario: Usuario): Boolean =
         movimientos.value.any { it.responsableId == usuario.id }
 
+    fun desactivarUsuario(usuario: Usuario) {
+        cambiarYRecargar { repository.desactivar(usuario.id) }
+    }
+
+    fun reactivarUsuario(usuario: Usuario) {
+        cambiarYRecargar { repository.reactivar(usuario.id) }
+    }
+
     fun eliminarUsuario(usuario: Usuario) {
         if (tieneMovimientos(usuario)) return
-        viewModelScope.launch {
-            ejecutar {
-                repository.eliminar(usuario.id)
-                _usuarios.value = repository.listar()
-            }
-        }
+        cambiarYRecargar { repository.eliminar(usuario.id) }
     }
 
     fun limpiarError() {
         _error.value = null
+    }
+
+    private fun cambiarYRecargar(cambio: suspend () -> Unit) {
+        viewModelScope.launch {
+            ejecutar {
+                cambio()
+                _usuarios.value = repository.listar()
+            }
+        }
     }
 
     private suspend fun ejecutar(accion: suspend () -> Unit) {

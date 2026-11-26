@@ -4,6 +4,7 @@ import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.model.Usuario
 import com.example.pockettrackkaiju_tea.repository.UsuarioRepositoryEnMemoria
 import com.example.pockettrackkaiju_tea.viewmodel.LoginViewModel
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -143,5 +144,19 @@ class LoginViewModelTest {
 
         assertFalse(entro)
         assertNotNull(viewModel.estadoFormulario.value.errores.errorEmail)
+    }
+
+    @Test
+    fun usuarioDesactivadoNoPuedeIniciarSesion() {
+        val repositorio = UsuarioRepositoryEnMemoria()
+        runBlocking { repositorio.desactivar(1) } // thomas@kaiju.cl
+        viewModel = LoginViewModel(repositorio)
+        var entro = false
+        completarFormulario("thomas@kaiju.cl", "12345678")
+
+        viewModel.iniciarSesion { _, _ -> entro = true }
+
+        assertFalse(entro)
+        assertNotNull(viewModel.estadoFormulario.value.errores.errorPassword)
     }
 }

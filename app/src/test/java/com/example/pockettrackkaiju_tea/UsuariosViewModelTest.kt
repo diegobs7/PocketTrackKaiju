@@ -6,6 +6,7 @@ import com.example.pockettrackkaiju_tea.repository.UsuarioRepositoryEnMemoria
 import com.example.pockettrackkaiju_tea.viewmodel.UsuariosViewModel
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -80,5 +81,43 @@ class UsuariosViewModelTest {
         assertNotNull(viewModel.error.value)
         viewModel.limpiarError()
         assertNull(viewModel.error.value)
+    }
+    @Test
+    fun desactivarMarcaAlUsuarioComoInactivoYNoLoBorra() {
+        val thomas = usuarioPorCorreo("thomas@kaiju.cl")
+
+        viewModel.desactivarUsuario(thomas)
+
+        assertEquals(3, viewModel.usuarios.value.size)
+        assertFalse(usuarioPorCorreo("thomas@kaiju.cl").activo)
+    }
+
+    @Test
+    fun reactivarDevuelveAlUsuarioAEstarActivo() {
+        val thomas = usuarioPorCorreo("thomas@kaiju.cl")
+        viewModel.desactivarUsuario(thomas)
+
+        viewModel.reactivarUsuario(usuarioPorCorreo("thomas@kaiju.cl"))
+
+        assertTrue(usuarioPorCorreo("thomas@kaiju.cl").activo)
+    }
+
+    @Test
+    fun desactivarAUnoNoAfectaALosDemas() {
+        viewModel.desactivarUsuario(usuarioPorCorreo("thomas@kaiju.cl"))
+
+        assertTrue(usuarioPorCorreo("andres@kaiju.cl").activo)
+        assertTrue(usuarioPorCorreo("diego@kaiju.cl").activo)
+    }
+
+    @Test
+    fun desactivarUnUsuarioInexistenteGuardaUnMensajeDeError() {
+        val thomas = usuarioPorCorreo("thomas@kaiju.cl")
+        viewModel.eliminarUsuario(thomas)
+
+        // Ya no existe: el backend responde "no encontrado".
+        viewModel.desactivarUsuario(thomas)
+
+        assertNotNull(viewModel.error.value)
     }
 }

@@ -37,7 +37,9 @@ class UsuarioRepositoryEnMemoria : UsuarioRepository {
 
     override suspend fun iniciarSesion(correo: String, password: String): Usuario {
         val cuenta = cuentas.find {
-            it.usuario.correo == correo.trim().lowercase() && it.password == password
+            it.usuario.correo == correo.trim().lowercase() &&
+                    it.password == password &&
+                    it.usuario.activo
         } ?: throw ErrorBackend(401, "Correo o contraseña incorrectos.")
         idSesion = cuenta.usuario.id
         return cuenta.usuario
@@ -70,6 +72,20 @@ class UsuarioRepositoryEnMemoria : UsuarioRepository {
     override suspend fun cambiarRol(id: Int, rol: Rol): Usuario {
         val cuenta = buscar(id)
         cuenta.usuario = cuenta.usuario.copy(rol = rol)
+        return cuenta.usuario
+    }
+
+    override suspend fun desactivar(id: Int) {
+        val cuenta = buscar(id)
+        if (idSesion == id) {
+            throw ErrorBackend(409, "No puedes desactivar tu propia cuenta.")
+        }
+        cuenta.usuario = cuenta.usuario.copy(activo = false)
+    }
+
+    override suspend fun reactivar(id: Int): Usuario {
+        val cuenta = buscar(id)
+        cuenta.usuario = cuenta.usuario.copy(activo = true)
         return cuenta.usuario
     }
 
