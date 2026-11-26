@@ -4,14 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pockettrackkaiju_tea.model.ErroresRegistroUsuario
 import com.example.pockettrackkaiju_tea.model.FormularioRegistroUsuario
-import com.example.pockettrackkaiju_tea.model.Rol
-import com.example.pockettrackkaiju_tea.model.Usuario
+import com.example.pockettrackkaiju_tea.remote.ErrorBackend
 import com.example.pockettrackkaiju_tea.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -21,13 +18,6 @@ class RegistroUsuarioViewModel(
 
     private val _estadoFormulario = MutableStateFlow(FormularioRegistroUsuario())
     val estadoFormulario: StateFlow<FormularioRegistroUsuario> = _estadoFormulario.asStateFlow()
-
-    private val usuarios: StateFlow<List<Usuario>> = repository.usuarios
-        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
-
-    init {
-        viewModelScope.launch { repository.cargarUsuariosDePrueba() }
-    }
 
     fun actualizarNombre(valor: String) = _estadoFormulario.update {
         it.copy(nombre = valor, errores = it.errores.copy(errorNombre = null))
@@ -47,7 +37,6 @@ class RegistroUsuarioViewModel(
 
     fun validarFormulario(): Boolean {
         val estado = _estadoFormulario.value
-        val correoNormalizado = estado.email.trim().lowercase()
 
         val errorNombre = when {
             estado.nombre.isBlank() -> "El nombre es obligatorio."
@@ -58,13 +47,13 @@ class RegistroUsuarioViewModel(
         val errorEmail = when {
             estado.email.isBlank() -> "El correo electronico es obligatorio."
             !EMAIL_REGEX.matches(estado.email.trim()) -> "Ingrese un correo valido."
-            usuarios.value.any { it.correo == correoNormalizado } -> "Ya existe una cuenta con ese correo."
             else -> null
         }
 
         val errorPassword = when {
             estado.password.isBlank() -> "La contraseña es obligatoria."
-            estado.password.length < 4 -> "La contraseña debe tener minimo 4 caracteres"
+            estado.password.length < 8 -> "La contraseña debe tener minimo 8 caracteres"
+            estado.password.length > 72 -> "La contraseña puede tener como maximo 72 caracteres"
             else -> null
         }
         val errorConfirmarPassword = when {
@@ -86,20 +75,32 @@ class RegistroUsuarioViewModel(
         return errorNombre == null && errorEmail == null && errorPassword == null && errorConfirmarPassword == null
     }
 
-    fun registrarUsuario(): Boolean {
-        if (!validarFormulario()) return false
+    fun registrarUsuario(onExito: () -> Unit) {
+        if (_estadoFormulario.value.cargando) return
+        if (!validarFormulario()) return
 
         val estado = _estadoFormulario.value
-        val usuario = Usuario(
-            nombre = estado.nombre.trim(),
-            correo = estado.email.trim().lowercase(),
-            contra = estado.password,
-            rol = Rol.VENDEDOR
-        )
-        viewModelScope.launch { repository.guardar(usuario) }
+        _estadoFormulario.update { it.copy(cargando = true) }
+        viewModelScope.launch {
+            try {
+                repository.registrar(estado.nombre.trim(), estado.email.trim().lowercase(), estado.password)
+                _estadoFormulario.value = FormularioRegistroUsuario()
+                onExito()
+            } catch (e: ErrorBackend) {
+                _estadoFormulario.update {
+                    it.copy(cargando = false, errores = erroresDelBackend(e, it.errores))
+                }
+            }
+        }
+    }
 
-        _estadoFormulario.value = FormularioRegistroUsuario()
-        return true
+    private fun erroresDelBackend(
+        e: ErrorBackend,
+        actuales: ErroresRegistroUsuario
+    ): ErroresRegistroUsuario = when {
+        e.esCorreoRepetido -> actuales.copy(errorEmail = "Ya existe una cuenta con ese correo.")
+        e.esSinConexion -> actuales.copy(errorConfirmarPassword = "No se pudo conectar con el servidor.")
+        else -> actuales.copy(errorConfirmarPassword = e.message ?: "No se pudo registrar la cuenta.")
     }
 
     private companion object {

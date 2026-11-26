@@ -1,9 +1,9 @@
 package com.example.pockettrackkaiju_tea
 
-
 import com.example.pockettrackkaiju_tea.model.Rol
-import com.example.pockettrackkaiju_tea.repository.UsuarioRepository
+import com.example.pockettrackkaiju_tea.repository.UsuarioRepositoryEnMemoria
 import com.example.pockettrackkaiju_tea.viewmodel.RegistroUsuarioViewModel
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -18,14 +18,14 @@ class RegistroUsuarioViewModelTest {
     @get:Rule
     val reglaMain = ReglaDispatcherPrincipal()
 
-    private lateinit var usuarioDao: FakeUsuarioDao
+    private lateinit var repositorio: UsuarioRepositoryEnMemoria
     private lateinit var viewModel: RegistroUsuarioViewModel
 
     @Before
     fun preparar() {
-        usuarioDao = FakeUsuarioDao()
-        // Al crearse, el ViewModel carga los 3 usuarios de prueba (thomas@, andres@ y diego@kaiju.cl).
-        viewModel = RegistroUsuarioViewModel(UsuarioRepository(usuarioDao))
+        // El repositorio en memoria trae 3 usuarios (thomas@, andres@ y diego@kaiju.cl).
+        repositorio = UsuarioRepositoryEnMemoria()
+        viewModel = RegistroUsuarioViewModel(repositorio)
     }
 
     private fun completarFormularioValido(
@@ -71,21 +71,37 @@ class RegistroUsuarioViewModelTest {
     fun noSePuedeRegistrarUnCorreoYaExistente() {
         completarFormularioValido(email = "thomas@kaiju.cl")
 
-        assertFalse(viewModel.validarFormulario())
+        var registrado = false
+        viewModel.registrarUsuario { registrado = true }
+
+        assertFalse(registrado)
         assertNotNull(viewModel.estadoFormulario.value.errores.errorEmail)
+        assertFalse(viewModel.estadoFormulario.value.cargando)
     }
 
     @Test
     fun elCorreoRepetidoSeDetectaSinImportarMayusculas() {
         completarFormularioValido(email = "THOMAS@Kaiju.cl")
 
-        assertFalse(viewModel.validarFormulario())
+        var registrado = false
+        viewModel.registrarUsuario { registrado = true }
+
+        assertFalse(registrado)
         assertNotNull(viewModel.estadoFormulario.value.errores.errorEmail)
     }
 
     @Test
-    fun passwordConMenosDe4CaracteresEsInvalida() {
-        completarFormularioValido(password = "123", confirmar = "123")
+    fun passwordConMenosDe8CaracteresEsInvalida() {
+        completarFormularioValido(password = "1234567", confirmar = "1234567")
+
+        assertFalse(viewModel.validarFormulario())
+        assertNotNull(viewModel.estadoFormulario.value.errores.errorPassword)
+    }
+
+    @Test
+    fun passwordConMasDe72CaracteresEsInvalida() {
+        val larga = "a".repeat(73)
+        completarFormularioValido(password = larga, confirmar = larga)
 
         assertFalse(viewModel.validarFormulario())
         assertNotNull(viewModel.estadoFormulario.value.errores.errorPassword)
@@ -115,12 +131,15 @@ class RegistroUsuarioViewModelTest {
     fun registrarGuardaElUsuarioConCorreoEnMinusculas() {
         completarFormularioValido(email = "  Camila@Kaiju.CL ")
 
-        assertTrue(viewModel.registrarUsuario())
+        var registrado = false
+        viewModel.registrarUsuario { registrado = true }
 
-        val nuevo = usuarioDao.lista.last()
+        assertTrue(registrado)
+        val usuarios = runBlocking { repositorio.listar() }
+        val nuevo = usuarios.last()
         assertEquals("camila@kaiju.cl", nuevo.correo)
         assertEquals("Camila Rojas", nuevo.nombre)
-        assertEquals(4, usuarioDao.lista.size)
+        assertEquals(4, usuarios.size)
     }
 
     @Test
@@ -128,25 +147,27 @@ class RegistroUsuarioViewModelTest {
         // Nadie puede registrarse como administrador desde la pantalla de registro.
         completarFormularioValido()
 
-        viewModel.registrarUsuario()
+        viewModel.registrarUsuario { }
 
-        assertEquals(Rol.VENDEDOR, usuarioDao.lista.last().rol)
+        assertEquals(Rol.VENDEDOR, runBlocking { repositorio.listar() }.last().rol)
     }
 
     @Test
     fun registroInvalidoNoGuardaNada() {
         completarFormularioValido(confirmar = "distinta")
 
-        assertFalse(viewModel.registrarUsuario())
+        var registrado = false
+        viewModel.registrarUsuario { registrado = true }
 
-        assertEquals(3, usuarioDao.lista.size)
+        assertFalse(registrado)
+        assertEquals(3, runBlocking { repositorio.listar() }.size)
     }
 
     @Test
     fun alRegistrarElFormularioSeLimpia() {
         completarFormularioValido()
 
-        viewModel.registrarUsuario()
+        viewModel.registrarUsuario { }
 
         assertEquals("", viewModel.estadoFormulario.value.nombre)
         assertEquals("", viewModel.estadoFormulario.value.email)

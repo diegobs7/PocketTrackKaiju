@@ -4,12 +4,13 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.pockettrackkaiju_tea.database.AppDatabase
+import com.example.pockettrackkaiju_tea.remote.PokeApiClient
 import com.example.pockettrackkaiju_tea.repository.MovimientoRepository
+import com.example.pockettrackkaiju_tea.repository.PokemonRepository
 import com.example.pockettrackkaiju_tea.repository.ProductoRepository
 import com.example.pockettrackkaiju_tea.repository.UsuarioRepository
+import com.example.pockettrackkaiju_tea.repository.UsuarioRepositoryEnMemoria
 import com.example.pockettrackkaiju_tea.util.SesionGuardada
-import com.example.pockettrackkaiju_tea.remote.PokeApiClient
-import com.example.pockettrackkaiju_tea.repository.PokemonRepository
 
 class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
 
@@ -17,7 +18,7 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
     private val database = AppDatabase.getInstance(appContext)
     private val productoRepository = ProductoRepository(database.productoDao())
     private val movimientoRepository = MovimientoRepository(database.movimientoDao())
-    private val usuarioRepository = UsuarioRepository(database.usuarioDao())
+    private val usuarioRepository = repositorioDeUsuarios
     private val pokemonRepository = PokemonRepository(PokeApiClient.api)
 
     @Suppress("UNCHECKED_CAST")
@@ -39,11 +40,19 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
 
         modelClass.isAssignableFrom(SesionViewModel::class.java) ->
             SesionViewModel(usuarioRepository, SesionGuardada(appContext))
+
         modelClass.isAssignableFrom(UsuariosViewModel::class.java) ->
             UsuariosViewModel(usuarioRepository, movimientoRepository)
 
         modelClass.isAssignableFrom(EasterEggViewModel::class.java) ->
             EasterEggViewModel(pokemonRepository)
+
         else -> throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
     } as T
+
+    private companion object {
+        // Una sola instancia para toda la app: cada pantalla crea su propia fábrica,
+        // y todas deben compartir los mismos usuarios y la misma sesión.
+        val repositorioDeUsuarios: UsuarioRepository = UsuarioRepositoryEnMemoria()
+    }
 }

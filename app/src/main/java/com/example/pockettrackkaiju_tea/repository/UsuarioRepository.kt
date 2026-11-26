@@ -1,33 +1,29 @@
 package com.example.pockettrackkaiju_tea.repository
 
-import com.example.pockettrackkaiju_tea.database.dao.UsuarioDao
 import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.model.Usuario
-import kotlinx.coroutines.flow.Flow
 
-class UsuarioRepository(private val dao: UsuarioDao) {
+interface UsuarioRepository {
 
-    val usuarios: Flow<List<Usuario>> = dao.obtenerTodos()
+    /** Crea una cuenta nueva. El servidor le asigna el rol VENDEDOR. */
+    suspend fun registrar(nombre: String, correo: String, password: String)
 
-    suspend fun guardar(usuario: Usuario) = dao.insertar(usuario)
+    /** Inicia sesión, guarda el token y devuelve el perfil del usuario. */
+    suspend fun iniciarSesion(correo: String, password: String): Usuario
 
-    suspend fun eliminar(usuario: Usuario) = dao.eliminar(usuario)
+    /** Perfil del usuario con la sesión activa, para que recuerde la sesion iniciada. */
+    suspend fun obtenerPerfil(): Usuario
 
-    suspend fun existeCorreo(correo: String): Boolean =
-        dao.obtenerPorCorreo(correo.trim().lowercase()) != null
+    /** Olvida el token de la sesión activa. */
+    fun cerrarSesion()
 
-    suspend fun autenticar(correo: String, contra: String): Usuario? =
-        dao.autenticar(correo.trim().lowercase(), contra)
+    suspend fun listar(): List<Usuario>
 
-    suspend fun obtenerPorId(id: Int): Usuario? = dao.obtenerPorId(id)
+    suspend fun crear(nombre: String, correo: String, password: String, rol: Rol): Usuario
 
-    suspend fun cambiarRol(usuario: Usuario, nuevoRol: Rol) =
-        dao.cambiarRol(usuario.id, nuevoRol)
+    suspend fun editar(id: Int, nombre: String, correo: String): Usuario
 
-    suspend fun cargarUsuariosDePrueba() {
-        if (dao.contar() > 0) return
-        dao.insertar(Usuario(nombre = "Thomas Araya", correo = "thomas@kaiju.cl", contra = "1234", rol = Rol.VENDEDOR))
-        dao.insertar(Usuario(nombre = "Andrés Marín", correo = "andres@kaiju.cl", contra = "1234", rol = Rol.ADMINISTRADOR))
-        dao.insertar(Usuario(nombre = "Diego Bergeret", correo = "diego@kaiju.cl", contra = "1234", rol = Rol.ENCARGADO_INVENTARIO))
-    }
+    suspend fun cambiarRol(id: Int, rol: Rol): Usuario
+
+    suspend fun eliminar(id: Int)
 }

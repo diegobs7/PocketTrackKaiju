@@ -1,5 +1,6 @@
 package com.example.pockettrackkaiju_tea.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,12 +12,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -78,103 +85,136 @@ fun PantallaInicioSesion(
     val errorPassword = estado.errores.errorPassword
     val esErrorCredenciales = errorPassword == "Correo o contraseña incorrectos."
 
+    val formaCampo = RoundedCornerShape(12.dp)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Iniciar sesión", style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(32.dp))
-
-        if (esErrorCredenciales) {
-            Surface(
-                color = MaterialTheme.colorScheme.errorContainer,
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
+            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Text(
+                    text = "Iniciar sesión",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Controla tu inventario Kaiju",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(Modifier.height(24.dp))
+
+                if (esErrorCredenciales) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.errorContainer,
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Error,
+                                contentDescription = "Error",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Correo o contraseña incorrectos. Inténtalo de nuevo.",
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = estado.email,
+                    onValueChange = viewModel::actualizarEmail,
+                    label = { Text("Correo electrónico") },
+                    leadingIcon = { Icon(Icons.Filled.Email, contentDescription = null) },
+                    isError = errorEmail != null,
+                    shape = formaCampo,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                if (errorEmail != null) {
+                    MensajeErrorConIcono(errorEmail)
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = estado.password,
+                    onValueChange = viewModel::actualizarPassword,
+                    label = { Text("Contraseña") },
+                    leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+                    isError = errorPassword != null,
+                    shape = formaCampo,
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { intentarIngresar() }),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (errorPassword != null && !esErrorCredenciales) {
+                    MensajeErrorConIcono(errorPassword)
+                }
+
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Error,
-                        contentDescription = "Error",
-                        tint = MaterialTheme.colorScheme.error
+                    Checkbox(
+                        checked = estado.recordarme,
+                        onCheckedChange = viewModel::actualizarRecordarme
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Correo o contraseña incorrectos. Inténtalo de nuevo.",
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Text("Recordarme")
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                Button(
+                    onClick = intentarIngresar,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Text("Ingresar")
                 }
             }
         }
 
-        OutlinedTextField(
-            value = estado.email,
-            onValueChange = viewModel::actualizarEmail,
-            label = { Text("Correo electrónico") },
-            isError = errorEmail != null,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-        )
-
-
-        if (errorEmail != null) {
-            MensajeErrorConIcono(errorEmail)
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = estado.password,
-            onValueChange = viewModel::actualizarPassword,
-            label = { Text("Contraseña") },
-            isError = errorPassword != null,
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { intentarIngresar() }),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-
-        if (errorPassword != null && !esErrorCredenciales) {
-            MensajeErrorConIcono(errorPassword)
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = estado.recordarme,
-                onCheckedChange = viewModel::actualizarRecordarme
-            )
-            Text("Recordarme")
-        }
-
         Spacer(Modifier.height(16.dp))
 
-        Button(
-            onClick = intentarIngresar,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-        ) {
-            Text("Ingresar")
-        }
-        Spacer(Modifier.height(8.dp))
-
         TextButton(onClick = onIrRegistro) {
-            Text("¿No tienes cuenta? Regístrate")
+            Text(
+                text = "¿No tienes cuenta? Regístrate",
+                color = MaterialTheme.colorScheme.secondary,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 }
