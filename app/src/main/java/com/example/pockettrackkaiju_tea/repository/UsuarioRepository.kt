@@ -25,5 +25,12 @@ interface UsuarioRepository {
 
     suspend fun cambiarRol(id: Int, rol: Rol): Usuario
 
+    /** Deja al usuario sin acceso, pero conserva su cuenta. No se puede aplicar a la propia. */
+    suspend fun desactivar(id: Int)
+
+    /** Devuelve el acceso a un usuario desactivado. */
+    suspend fun reactivar(id: Int): Usuario
+
+    /** Borra la cuenta de forma permanente. */
     suspend fun eliminar(id: Int)
 }

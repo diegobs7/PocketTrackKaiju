@@ -19,6 +19,8 @@ fun TarjetaUsuario(
     usuario: Usuario,
     esElMismo: Boolean,
     onEditar: () -> Unit,
+    onDesactivar: () -> Unit,
+    onReactivar: () -> Unit,
     onEliminar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -39,6 +41,13 @@ fun TarjetaUsuario(
                 text = "Rol: ${etiquetaRol(usuario.rol)}",
                 style = MaterialTheme.typography.bodyMedium
             )
+            if (!usuario.activo) {
+                Text(
+                    text = "Cuenta desactivada",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
             if (!esElMismo) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -47,8 +56,17 @@ fun TarjetaUsuario(
                     TextButton(onClick = onEditar) {
                         Text("Editar")
                     }
-                    TextButton(onClick = onEliminar) {
-                        Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                    if (usuario.activo) {
+                        TextButton(onClick = onDesactivar) {
+                            Text("Desactivar")
+                        }
+                    } else {
+                        TextButton(onClick = onReactivar) {
+                            Text("Activar")
+                        }
+                        TextButton(onClick = onEliminar) {
+                            Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                        }
                     }
                 }
             }

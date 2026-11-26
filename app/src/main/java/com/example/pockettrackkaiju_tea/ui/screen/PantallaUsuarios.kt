@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.model.Usuario
 import com.example.pockettrackkaiju_tea.ui.components.BannerError
+import com.example.pockettrackkaiju_tea.ui.components.DialogoCambiarEstadoUsuario
 import com.example.pockettrackkaiju_tea.ui.components.DialogoEliminarUsuario
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaUsuario
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
@@ -34,6 +35,7 @@ fun PantallaUsuarios(
     val usuarios by viewModel.usuarios.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     var usuarioAEliminar by remember { mutableStateOf<Usuario?>(null) }
+    var usuarioACambiarEstado by remember { mutableStateOf<Usuario?>(null) }
 
     LaunchedEffect(Unit) { viewModel.cargarUsuarios() }
 
@@ -46,6 +48,21 @@ fun PantallaUsuarios(
                 usuarioAEliminar = null
             },
             onCerrar = { usuarioAEliminar = null }
+        )
+    }
+
+    usuarioACambiarEstado?.let { usuario ->
+        DialogoCambiarEstadoUsuario(
+            usuario = usuario,
+            onConfirmar = {
+                if (usuario.activo) {
+                    viewModel.desactivarUsuario(usuario)
+                } else {
+                    viewModel.reactivarUsuario(usuario)
+                }
+                usuarioACambiarEstado = null
+            },
+            onCerrar = { usuarioACambiarEstado = null }
         )
     }
 
@@ -70,6 +87,8 @@ fun PantallaUsuarios(
                 usuario = usuario,
                 esElMismo = usuario.id == usuarioActual.id,
                 onEditar = { onEditar(usuario) },
+                onDesactivar = { usuarioACambiarEstado = usuario },
+                onReactivar = { usuarioACambiarEstado = usuario },
                 onEliminar = { usuarioAEliminar = usuario }
             )
         }
