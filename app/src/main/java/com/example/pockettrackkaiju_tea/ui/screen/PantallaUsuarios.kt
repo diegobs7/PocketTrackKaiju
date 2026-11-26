@@ -1,11 +1,22 @@
 package com.example.pockettrackkaiju_tea.ui.screen
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,11 +29,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.model.Usuario
 import com.example.pockettrackkaiju_tea.ui.components.BannerError
 import com.example.pockettrackkaiju_tea.ui.components.DialogoCambiarEstadoUsuario
 import com.example.pockettrackkaiju_tea.ui.components.DialogoEliminarUsuario
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaUsuario
+import com.example.pockettrackkaiju_tea.ui.components.etiquetaRol
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.UsuariosViewModel
 
@@ -33,6 +46,9 @@ fun PantallaUsuarios(
     onEditar: (Usuario) -> Unit = {}
 ) {
     val usuarios by viewModel.usuarios.collectAsStateWithLifecycle()
+    val usuariosFiltrados by viewModel.usuariosFiltrados.collectAsStateWithLifecycle()
+    val busqueda by viewModel.busqueda.collectAsStateWithLifecycle()
+    val rolFiltro by viewModel.rolFiltro.collectAsStateWithLifecycle()
     val error by viewModel.error.collectAsStateWithLifecycle()
     var usuarioAEliminar by remember { mutableStateOf<Usuario?>(null) }
     var usuarioACambiarEstado by remember { mutableStateOf<Usuario?>(null) }
@@ -78,11 +94,52 @@ fun PantallaUsuarios(
             )
         }
         item {
+            OutlinedTextField(
+                value = busqueda,
+                onValueChange = viewModel::actualizarBusqueda,
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                placeholder = { Text("Buscar por nombre") },
+                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                trailingIcon = {
+                    if (busqueda.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.actualizarBusqueda("") }) {
+                            Icon(Icons.Filled.Clear, contentDescription = "Borrar búsqueda")
+                        }
+                    }
+                }
+            )
+        }
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Rol.entries.forEach { rol ->
+                    FilterChip(
+                        selected = rolFiltro == rol,
+                        onClick = { viewModel.seleccionarRol(rol) },
+                        label = { Text(etiquetaRol(rol)) }
+                    )
+                }
+            }
+        }
+        item {
             error?.let { mensaje ->
                 BannerError(mensaje = mensaje, onCerrar = viewModel::limpiarError)
             }
         }
-        items(usuarios, key = { it.id }) { usuario ->
+        if (usuariosFiltrados.isEmpty() && usuarios.isNotEmpty()) {
+            item {
+                Text(
+                    text = "No hay usuarios que coincidan con la búsqueda.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+        items(usuariosFiltrados, key = { it.id }) { usuario ->
             TarjetaUsuario(
                 usuario = usuario,
                 esElMismo = usuario.id == usuarioActual.id,
