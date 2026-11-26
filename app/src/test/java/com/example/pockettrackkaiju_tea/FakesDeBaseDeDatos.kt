@@ -2,7 +2,6 @@ package com.example.pockettrackkaiju_tea
 
 import com.example.pockettrackkaiju_tea.database.dao.MovimientoDao
 import com.example.pockettrackkaiju_tea.database.dao.ProductoDao
-import com.example.pockettrackkaiju_tea.database.dao.UsuarioDao
 import com.example.pockettrackkaiju_tea.model.CategoriaProducto
 import com.example.pockettrackkaiju_tea.model.Movimiento
 import com.example.pockettrackkaiju_tea.model.Producto
@@ -39,44 +38,6 @@ class FakeProductoDao : ProductoDao {
 
     override suspend fun eliminar(producto: Producto) {
         tabla.update { lista -> lista.filterNot { it.id == producto.id } }
-    }
-}
-
-class FakeUsuarioDao : UsuarioDao {
-    private val tabla = MutableStateFlow<List<Usuario>>(emptyList())
-    private var siguienteId = 1
-
-    val lista: List<Usuario> get() = tabla.value
-
-    fun agregarDirecto(usuario: Usuario): Usuario {
-        val guardado = usuario.copy(id = siguienteId++)
-        tabla.update { it + guardado }
-        return guardado
-    }
-
-    override fun obtenerTodos(): Flow<List<Usuario>> = tabla
-
-    override suspend fun insertar(usuario: Usuario) {
-        agregarDirecto(usuario)
-    }
-
-    override suspend fun eliminar(usuario: Usuario) {
-        tabla.update { lista -> lista.filterNot { it.id == usuario.id } }
-    }
-
-    override suspend fun contar(): Int = tabla.value.size
-
-    override suspend fun obtenerPorCorreo(correo: String): Usuario? =
-        tabla.value.find { it.correo == correo }
-
-    override suspend fun autenticar(correo: String, contra: String): Usuario? =
-        tabla.value.find { it.correo == correo && it.contra == contra }
-
-    override suspend fun obtenerPorId(id: Int): Usuario? =
-        tabla.value.find { it.id == id }
-
-    override suspend fun cambiarRol(id: Int, rol: Rol) {
-        tabla.update { lista -> lista.map { if (it.id == id) it.copy(rol = rol) else it } }
     }
 }
 
@@ -129,7 +90,6 @@ fun usuarioDePrueba(id: Int = 1, rol: Rol = Rol.ENCARGADO_INVENTARIO) = Usuario(
     id = id,
     nombre = "Diego Bergeret",
     correo = "diego@kaiju.cl",
-    contra = "1234",
     rol = rol
 )
 

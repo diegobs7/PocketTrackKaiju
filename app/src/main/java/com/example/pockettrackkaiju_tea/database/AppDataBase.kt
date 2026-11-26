@@ -6,20 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.pockettrackkaiju_tea.database.dao.MovimientoDao
 import com.example.pockettrackkaiju_tea.database.dao.ProductoDao
-import com.example.pockettrackkaiju_tea.database.dao.UsuarioDao
 import com.example.pockettrackkaiju_tea.model.Movimiento
 import com.example.pockettrackkaiju_tea.model.Producto
-import com.example.pockettrackkaiju_tea.model.Usuario
 
 @Database(
-    entities = [Producto::class, Usuario::class, Movimiento::class],
-    version = 1,
+    entities = [Producto::class, Movimiento::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun productoDao(): ProductoDao
-    abstract fun usuarioDao(): UsuarioDao
     abstract fun movimientoDao(): MovimientoDao
 
     companion object {
@@ -32,7 +29,8 @@ abstract class AppDatabase : RoomDatabase() {
                     contexto.applicationContext,
                     AppDatabase::class.java,
                     "pockettrack_db"
-                ).build().also { instancia = it }
+                ).fallbackToDestructiveMigration(true)
+                    .build().also { instancia = it }
             }
     }
 }

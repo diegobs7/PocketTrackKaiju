@@ -3,6 +3,7 @@ package com.example.pockettrackkaiju_tea.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pockettrackkaiju_tea.model.Usuario
+import com.example.pockettrackkaiju_tea.remote.ErrorBackend
 import com.example.pockettrackkaiju_tea.repository.UsuarioRepository
 import com.example.pockettrackkaiju_tea.util.SesionGuardada
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,14 +24,12 @@ class SesionViewModel(
 
     init {
         viewModelScope.launch {
-            val usuarioId = sesionGuardada.obtenerUsuarioId()
-            if (usuarioId != null) {
-                val usuario = repository.obtenerPorId(usuarioId)
-                if (usuario != null) {
-                    _usuarioActual.value = usuario
-                } else {
+            if (sesionGuardada.obtenerUsuarioId() != null) {
+                try {
+                    _usuarioActual.value = repository.obtenerPerfil()
+                } catch (e: ErrorBackend) {
                     sesionGuardada.borrar()
-            }
+                }
             }
             _cargando.value = false
         }
@@ -42,6 +41,7 @@ class SesionViewModel(
     }
 
     fun cerrarSesion() {
+        repository.cerrarSesion()
         _usuarioActual.value = null
         sesionGuardada.borrar()
     }

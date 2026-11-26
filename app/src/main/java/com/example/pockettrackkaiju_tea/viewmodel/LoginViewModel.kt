@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.pockettrackkaiju_tea.model.ErroresLogin
 import com.example.pockettrackkaiju_tea.model.FormularioLogin
 import com.example.pockettrackkaiju_tea.model.Usuario
+import com.example.pockettrackkaiju_tea.remote.ErrorBackend
 import com.example.pockettrackkaiju_tea.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,11 +17,6 @@ import kotlinx.coroutines.launch
 class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
     private val _estadoFormulario = MutableStateFlow(FormularioLogin())
     val estadoFormulario: StateFlow<FormularioLogin> = _estadoFormulario.asStateFlow()
-
-    init {
-
-        viewModelScope.launch { repository.cargarUsuariosDePrueba() }
-    }
 
     fun actualizarEmail(valor: String) = _estadoFormulario.update {
         it.copy(email = valor, errores = it.errores.copy(errorEmail = null))
@@ -41,7 +37,7 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
 
         val errorPassword = when {
             estado.password.isBlank() -> "La contraseña es obligatoria."
-            estado.password.length < 4 -> "La contraseña debe tener minimo 4 caracteres"
+            estado.password.length < 8 -> "La contraseña debe tener minimo 8 caracteres"
             else -> null
         }
 
@@ -53,16 +49,23 @@ class LoginViewModel(private val repository: UsuarioRepository) : ViewModel() {
 
     fun iniciarSesion(onExito: (Usuario, Boolean) -> Unit) {
         if (!validarFormulario()) return
+        if (_estadoFormulario.value.cargando) return
 
         val estado = _estadoFormulario.value
+        _estadoFormulario.update { it.copy(cargando = true) }
         viewModelScope.launch {
-            val usuario = repository.autenticar(estado.email, estado.password)
-            if (usuario != null) {
+            try {
+                val usuario = repository.iniciarSesion(estado.email, estado.password)
                 _estadoFormulario.value = FormularioLogin()
                 onExito(usuario, estado.recordarme)
-            } else {
+            } catch (e: ErrorBackend) {
+                val mensaje = when {
+                    e.esCredencialesInvalidas -> "Correo o contraseña incorrectos."
+                    e.esSinConexion -> "No se pudo conectar con el servidor."
+                    else -> e.message ?: "No se pudo iniciar sesión."
+                }
                 _estadoFormulario.update {
-                    it.copy(errores = ErroresLogin(null, "Correo o contraseña incorrectos."))
+                    it.copy(cargando = false, errores = ErroresLogin(null, mensaje))
                 }
             }
         }

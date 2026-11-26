@@ -2,7 +2,7 @@ package com.example.pockettrackkaiju_tea
 
 import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.model.Usuario
-import com.example.pockettrackkaiju_tea.repository.UsuarioRepository
+import com.example.pockettrackkaiju_tea.repository.UsuarioRepositoryEnMemoria
 import com.example.pockettrackkaiju_tea.viewmodel.LoginViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -22,9 +22,8 @@ class LoginViewModelTest {
 
     @Before
     fun preparar() {
-        // Al crearse, el ViewModel carga los 3 usuarios de prueba si la tabla está vacía
-        // (andres@kaiju.cl es ADMINISTRADOR, clave 1234).
-        viewModel = LoginViewModel(UsuarioRepository(FakeUsuarioDao()))
+        // El repositorio en memoria trae 3 usuarios (andres@kaiju.cl es ADMINISTRADOR, clave 12345678).
+        viewModel = LoginViewModel(UsuarioRepositoryEnMemoria())
     }
 
     private fun completarFormulario(email: String, password: String) {
@@ -36,7 +35,7 @@ class LoginViewModelTest {
 
     @Test
     fun correoVacioEsInvalido() {
-        completarFormulario("", "1234")
+        completarFormulario("", "12345678")
 
         assertFalse(viewModel.validarFormulario())
         assertNotNull(viewModel.estadoFormulario.value.errores.errorEmail)
@@ -44,7 +43,7 @@ class LoginViewModelTest {
 
     @Test
     fun correoSinFormatoEsInvalido() {
-        completarFormulario("esto-no-es-un-correo", "1234")
+        completarFormulario("esto-no-es-un-correo", "12345678")
 
         assertFalse(viewModel.validarFormulario())
         assertNotNull(viewModel.estadoFormulario.value.errores.errorEmail)
@@ -59,8 +58,8 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun passwordConMenosDe4CaracteresEsInvalida() {
-        completarFormulario("andres@kaiju.cl", "123")
+    fun passwordConMenosDe8CaracteresEsInvalida() {
+        completarFormulario("andres@kaiju.cl", "1234567")
 
         assertFalse(viewModel.validarFormulario())
         assertNotNull(viewModel.estadoFormulario.value.errores.errorPassword)
@@ -68,7 +67,7 @@ class LoginViewModelTest {
 
     @Test
     fun formularioCorrectoNoTieneErrores() {
-        completarFormulario("andres@kaiju.cl", "1234")
+        completarFormulario("andres@kaiju.cl", "12345678")
 
         assertTrue(viewModel.validarFormulario())
         assertNull(viewModel.estadoFormulario.value.errores.errorEmail)
@@ -81,7 +80,7 @@ class LoginViewModelTest {
     fun credencialesCorrectasEntreganElUsuarioYElRecordarme() {
         var usuarioRecibido: Usuario? = null
         var recordarRecibido = false
-        completarFormulario("andres@kaiju.cl", "1234")
+        completarFormulario("andres@kaiju.cl", "12345678")
         viewModel.actualizarRecordarme(true)
 
         viewModel.iniciarSesion { usuario, recordar ->
@@ -96,7 +95,7 @@ class LoginViewModelTest {
     @Test
     fun elCorreoSeNormalizaConEspaciosYMayusculas() {
         var usuarioRecibido: Usuario? = null
-        completarFormulario("  ANDRES@Kaiju.CL ", "1234")
+        completarFormulario("  ANDRES@Kaiju.CL ", "12345678")
 
         viewModel.iniciarSesion { usuario, _ -> usuarioRecibido = usuario }
 
@@ -105,7 +104,7 @@ class LoginViewModelTest {
 
     @Test
     fun alIngresarBienElFormularioSeLimpia() {
-        completarFormulario("andres@kaiju.cl", "1234")
+        completarFormulario("andres@kaiju.cl", "12345678")
 
         viewModel.iniciarSesion { _, _ -> }
 
@@ -116,18 +115,19 @@ class LoginViewModelTest {
     @Test
     fun passwordIncorrectaNoDejaEntrarYMuestraError() {
         var entro = false
-        completarFormulario("andres@kaiju.cl", "9999")
+        completarFormulario("andres@kaiju.cl", "clave-incorrecta")
 
         viewModel.iniciarSesion { _, _ -> entro = true }
 
         assertFalse(entro)
         assertNotNull(viewModel.estadoFormulario.value.errores.errorPassword)
+        assertFalse(viewModel.estadoFormulario.value.cargando)
     }
 
     @Test
     fun correoNoRegistradoNoDejaEntrar() {
         var entro = false
-        completarFormulario("fantasma@kaiju.cl", "1234")
+        completarFormulario("fantasma@kaiju.cl", "12345678")
 
         viewModel.iniciarSesion { _, _ -> entro = true }
 
