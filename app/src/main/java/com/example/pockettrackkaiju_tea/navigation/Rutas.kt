@@ -16,7 +16,13 @@ sealed class Rutas(val ruta: String) {
         fun crearRuta(productoId: Int) = "editarProducto/$productoId"
     }
 
+    object EditarUsuario : Rutas("editarUsuario/{usuarioId}") {
+        fun crearRuta(usuarioId: Int) = "editarUsuario/$usuarioId"
+    }
+
     object Usuarios : Rutas("usuarios")
+
+    object CrearUsuario : Rutas("crear_usuario")
 
     object DetalleProducto : Rutas("detalleProducto/{productoId}") {
         fun crearRuta(productoId: Int) = "detalleProducto/$productoId"

@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.model.Usuario
-import com.example.pockettrackkaiju_tea.ui.components.DialogoCambiarRol
+import com.example.pockettrackkaiju_tea.ui.components.BannerError
 import com.example.pockettrackkaiju_tea.ui.components.DialogoEliminarUsuario
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaUsuario
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
@@ -27,22 +28,14 @@ import com.example.pockettrackkaiju_tea.viewmodel.UsuariosViewModel
 @Composable
 fun PantallaUsuarios(
     usuarioActual: Usuario,
-    viewModel: UsuariosViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
+    viewModel: UsuariosViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
+    onEditar: (Usuario) -> Unit = {}
 ) {
     val usuarios by viewModel.usuarios.collectAsStateWithLifecycle()
-    var usuarioAEditar by remember { mutableStateOf<Usuario?>(null) }
+    val error by viewModel.error.collectAsStateWithLifecycle()
     var usuarioAEliminar by remember { mutableStateOf<Usuario?>(null) }
 
-    usuarioAEditar?.let { usuario ->
-        DialogoCambiarRol(
-            usuario = usuario,
-            onGuardar = { nuevoRol ->
-                viewModel.cambiarRol(usuario, nuevoRol)
-                usuarioAEditar = null
-            },
-            onCerrar = { usuarioAEditar = null }
-        )
-    }
+    LaunchedEffect(Unit) { viewModel.cargarUsuarios() }
 
     usuarioAEliminar?.let { usuario ->
         DialogoEliminarUsuario(
@@ -58,7 +51,7 @@ fun PantallaUsuarios(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
+        contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 80.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
@@ -67,12 +60,17 @@ fun PantallaUsuarios(
                 style = MaterialTheme.typography.titleMedium
             )
         }
+        item {
+            error?.let { mensaje ->
+                BannerError(mensaje = mensaje, onCerrar = viewModel::limpiarError)
+            }
+        }
         items(usuarios, key = { it.id }) { usuario ->
             TarjetaUsuario(
                 usuario = usuario,
                 esElMismo = usuario.id == usuarioActual.id,
-                onCambiarRol = { usuarioAEditar = usuario },
-                onEliminar = {usuarioAEliminar = usuario}
+                onEditar = { onEditar(usuario) },
+                onEliminar = { usuarioAEliminar = usuario }
             )
         }
     }

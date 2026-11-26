@@ -58,6 +58,7 @@ import com.example.pockettrackkaiju_tea.ui.screen.PantallaUsuarios
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaDetalleProducto
 import com.example.pockettrackkaiju_tea.ui.components.EncabezadoKaiju
 import com.example.pockettrackkaiju_tea.ui.components.DialogoPokemon
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaEditarUsuario
 import com.example.pockettrackkaiju_tea.viewmodel.EasterEggViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,15 +107,20 @@ fun MiNavHost(
     val rutasSinBarra = listOf(
         Rutas.InicioSesion.ruta,
         Rutas.RegistroUsuario.ruta,
+        Rutas.CrearUsuario.ruta,
+        Rutas.EditarUsuario.ruta,
         Rutas.RegistroProducto.ruta,
         Rutas.EditarProducto.ruta
     )
     val rutasConBotonAtras = listOf(
         Rutas.RegistroUsuario.ruta,
+        Rutas.CrearUsuario.ruta,
+        Rutas.EditarUsuario.ruta,
         Rutas.RegistroProducto.ruta,
         Rutas.EditarProducto.ruta,
         Rutas.DetalleProducto.ruta
     )
+
     val mostrarBotonAtras = rutaActual in rutasConBotonAtras
     val mostrarBarraInferior = rutaActual != null && rutaActual !in rutasSinBarra
 
@@ -278,6 +284,12 @@ fun MiNavHost(
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "Agregar Producto")
                 }
+            } else if (rutaActual == Rutas.Usuarios.ruta && rol?.puedeGestionarUsuarios() == true) {
+                FloatingActionButton(
+                    onClick = { navController.navigate(Rutas.CrearUsuario.ruta) }
+                ) {
+                    Icon(Icons.Filled.Add, contentDescription = "Crear usuario")
+                }
             }
         }
     ) { padding ->
@@ -306,6 +318,21 @@ fun MiNavHost(
             composable(Rutas.RegistroUsuario.ruta) {
                 PantallaRegistroUsuario(
                     onRegistroExitoso = { navController.popBackStack() }
+                )
+            }
+            composable(Rutas.CrearUsuario.ruta) {
+                PantallaRegistroUsuario(
+                    conSelectorDeRol = true,
+                    onRegistroExitoso = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Rutas.EditarUsuario.ruta,
+                arguments = listOf(navArgument("usuarioId") { type = NavType.IntType })
+            ) { entrada ->
+                PantallaEditarUsuario(
+                    usuarioId = entrada.arguments?.getInt("usuarioId") ?: return@composable,
+                    onGuardadoExitoso = { navController.popBackStack() }
                 )
             }
             composable(
@@ -361,7 +388,12 @@ fun MiNavHost(
                 )
             }
             composable(Rutas.Usuarios.ruta) {
-                usuario?.let { PantallaUsuarios(it) }
+                usuario?.let {
+                    PantallaUsuarios(
+                        usuarioActual = it,
+                        onEditar = { u -> navController.navigate(Rutas.EditarUsuario.crearRuta(u.id)) }
+                    )
+                }
             }
         }
     }
