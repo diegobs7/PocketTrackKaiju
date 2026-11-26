@@ -47,6 +47,9 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
         modelClass.isAssignableFrom(EasterEggViewModel::class.java) ->
             EasterEggViewModel(pokemonRepository)
 
+        modelClass.isAssignableFrom(EditarUsuarioViewModel::class.java) ->
+            EditarUsuarioViewModel(usuarioRepository)
+
         else -> throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
     } as T
 

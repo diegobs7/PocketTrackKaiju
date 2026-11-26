@@ -58,6 +58,7 @@ import com.example.pockettrackkaiju_tea.ui.screen.PantallaUsuarios
 import com.example.pockettrackkaiju_tea.ui.screen.PantallaDetalleProducto
 import com.example.pockettrackkaiju_tea.ui.components.EncabezadoKaiju
 import com.example.pockettrackkaiju_tea.ui.components.DialogoPokemon
+import com.example.pockettrackkaiju_tea.ui.screen.PantallaEditarUsuario
 import com.example.pockettrackkaiju_tea.viewmodel.EasterEggViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -107,12 +108,14 @@ fun MiNavHost(
         Rutas.InicioSesion.ruta,
         Rutas.RegistroUsuario.ruta,
         Rutas.CrearUsuario.ruta,
+        Rutas.EditarUsuario.ruta,
         Rutas.RegistroProducto.ruta,
         Rutas.EditarProducto.ruta
     )
     val rutasConBotonAtras = listOf(
         Rutas.RegistroUsuario.ruta,
         Rutas.CrearUsuario.ruta,
+        Rutas.EditarUsuario.ruta,
         Rutas.RegistroProducto.ruta,
         Rutas.EditarProducto.ruta,
         Rutas.DetalleProducto.ruta
@@ -324,6 +327,15 @@ fun MiNavHost(
                 )
             }
             composable(
+                route = Rutas.EditarUsuario.ruta,
+                arguments = listOf(navArgument("usuarioId") { type = NavType.IntType })
+            ) { entrada ->
+                PantallaEditarUsuario(
+                    usuarioId = entrada.arguments?.getInt("usuarioId") ?: return@composable,
+                    onGuardadoExitoso = { navController.popBackStack() }
+                )
+            }
+            composable(
                 route = Rutas.EditarProducto.ruta,
                 arguments = listOf(navArgument("productoId") { type = NavType.IntType })
             ) { entrada ->
@@ -376,7 +388,12 @@ fun MiNavHost(
                 )
             }
             composable(Rutas.Usuarios.ruta) {
-                usuario?.let { PantallaUsuarios(it) }
+                usuario?.let {
+                    PantallaUsuarios(
+                        usuarioActual = it,
+                        onEditar = { u -> navController.navigate(Rutas.EditarUsuario.crearRuta(u.id)) }
+                    )
+                }
             }
         }
     }

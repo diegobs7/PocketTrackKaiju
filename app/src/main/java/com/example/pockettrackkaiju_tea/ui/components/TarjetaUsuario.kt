@@ -18,7 +18,7 @@ import com.example.pockettrackkaiju_tea.model.Usuario
 fun TarjetaUsuario(
     usuario: Usuario,
     esElMismo: Boolean,
-    onCambiarRol: () -> Unit,
+    onEditar: () -> Unit,
     onEliminar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -44,8 +44,8 @@ fun TarjetaUsuario(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = onCambiarRol) {
-                        Text("Cambiar rol")
+                    TextButton(onClick = onEditar) {
+                        Text("Editar")
                     }
                     TextButton(onClick = onEliminar) {
                         Text("Eliminar", color = MaterialTheme.colorScheme.error)

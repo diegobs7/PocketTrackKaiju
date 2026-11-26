@@ -1,7 +1,5 @@
 package com.example.pockettrackkaiju_tea
 
-
-import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.model.TipoMovimiento
 import com.example.pockettrackkaiju_tea.repository.MovimientoRepository
 import com.example.pockettrackkaiju_tea.repository.UsuarioRepositoryEnMemoria
@@ -49,14 +47,6 @@ class UsuariosViewModelTest {
         assertEquals(3, viewModel.usuarios.value.size)
     }
 
-    @Test
-    fun cambiarRolActualizaLaLista() {
-        val thomas = usuarioPorCorreo("thomas@kaiju.cl")
-
-        viewModel.cambiarRol(thomas, Rol.ADMINISTRADOR)
-
-        assertEquals(Rol.ADMINISTRADOR, usuarioPorCorreo("thomas@kaiju.cl").rol)
-    }
 
     @Test
     fun eliminarQuitaAlUsuarioDeLaLista() {

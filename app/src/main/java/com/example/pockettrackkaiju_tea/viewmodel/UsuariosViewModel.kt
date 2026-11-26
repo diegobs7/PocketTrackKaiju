@@ -3,7 +3,6 @@ package com.example.pockettrackkaiju_tea.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pockettrackkaiju_tea.model.Movimiento
-import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.model.Usuario
 import com.example.pockettrackkaiju_tea.remote.ErrorBackend
 import com.example.pockettrackkaiju_tea.repository.MovimientoRepository
@@ -36,16 +35,6 @@ class UsuariosViewModel(
     fun cargarUsuarios() {
         viewModelScope.launch {
             ejecutar { _usuarios.value = repository.listar() }
-        }
-    }
-
-    fun cambiarRol(usuario: Usuario, nuevoRol: Rol) {
-        if (usuario.rol == nuevoRol) return
-        viewModelScope.launch {
-            ejecutar {
-                repository.cambiarRol(usuario.id, nuevoRol)
-                _usuarios.value = repository.listar()
-            }
         }
     }
 

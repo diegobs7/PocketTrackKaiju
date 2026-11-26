@@ -21,10 +21,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -45,18 +41,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.pockettrackkaiju_tea.model.Rol
 import com.example.pockettrackkaiju_tea.ui.components.MensajeExito
-import com.example.pockettrackkaiju_tea.ui.components.OpcionMenu
+import com.example.pockettrackkaiju_tea.ui.components.SelectorRol
 import com.example.pockettrackkaiju_tea.ui.components.TextoApoyoCampo
-import com.example.pockettrackkaiju_tea.ui.components.etiquetaRol
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.RegistroUsuarioViewModel
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaRegistroUsuario(
     viewModel: RegistroUsuarioViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current)),
@@ -64,7 +57,6 @@ fun PantallaRegistroUsuario(
     onRegistroExitoso: () -> Unit = {}
 ) {
     val estado by viewModel.estadoFormulario.collectAsStateWithLifecycle()
-    var menuRolExpandido by remember { mutableStateOf(false) }
     var mostrarMensajeExito by remember { mutableStateOf(false) }
 
     val intentarRegistrar: () -> Unit = {
@@ -184,42 +176,10 @@ fun PantallaRegistroUsuario(
                     if (conSelectorDeRol) {
                         Spacer(Modifier.height(4.dp))
 
-                        ExposedDropdownMenuBox(
-                            expanded = menuRolExpandido,
-                            onExpandedChange = { menuRolExpandido = !menuRolExpandido },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            OutlinedTextField(
-                                value = etiquetaRol(estado.rol),
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text("Rol") },
-                                shape = formaCampo,
-                                trailingIcon = {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuRolExpandido)
-                                },
-                                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(),
-                                modifier = Modifier
-                                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                    .fillMaxWidth()
-                            )
-
-                            ExposedDropdownMenu(
-                                expanded = menuRolExpandido,
-                                onDismissRequest = { menuRolExpandido = false }
-                            ) {
-                                Rol.entries.forEach { rol ->
-                                    OpcionMenu(
-                                        texto = etiquetaRol(rol),
-                                        seleccionada = estado.rol == rol,
-                                        onClick = {
-                                            viewModel.actualizarRol(rol)
-                                            menuRolExpandido = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
+                        SelectorRol(
+                            rol = estado.rol,
+                            onRolSeleccionado = viewModel::actualizarRol
+                        )
                     }
 
                     Spacer(Modifier.height(20.dp))
