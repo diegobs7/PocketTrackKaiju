@@ -13,6 +13,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import com.example.pockettrackkaiju_tea.model.Rol
 
 class UsuariosViewModelTest {
 
@@ -119,5 +120,81 @@ class UsuariosViewModelTest {
         viewModel.desactivarUsuario(thomas)
 
         assertNotNull(viewModel.error.value)
+    }
+    // ---------- Búsqueda y filtro por rol ----------
+
+    @Test
+    fun buscarPorNombreNoDistingueMayusculas() {
+        viewModel.actualizarBusqueda("THOMAS")
+
+        assertEquals(1, viewModel.usuariosFiltrados.value.size)
+        assertEquals("thomas@kaiju.cl", viewModel.usuariosFiltrados.value.first().correo)
+    }
+
+    @Test
+    fun buscarEnMinusculasEncuentraElMismoUsuario() {
+        viewModel.actualizarBusqueda("thomas")
+
+        assertEquals("thomas@kaiju.cl", viewModel.usuariosFiltrados.value.first().correo)
+    }
+
+    @Test
+    fun buscarPorParteDelNombreFunciona() {
+        viewModel.actualizarBusqueda("ara")
+
+        assertEquals(1, viewModel.usuariosFiltrados.value.size)
+        assertEquals("thomas@kaiju.cl", viewModel.usuariosFiltrados.value.first().correo)
+    }
+
+    @Test
+    fun losEspaciosAlrededorDelTextoSeIgnoran() {
+        viewModel.actualizarBusqueda("  thomas  ")
+
+        assertEquals(1, viewModel.usuariosFiltrados.value.size)
+    }
+
+    @Test
+    fun sinTextoNiRolSeMuestranTodos() {
+        assertEquals(3, viewModel.usuariosFiltrados.value.size)
+
+        viewModel.actualizarBusqueda("")
+
+        assertEquals(3, viewModel.usuariosFiltrados.value.size)
+    }
+
+    @Test
+    fun filtrarPorRolMuestraSoloEsosUsuarios() {
+        viewModel.seleccionarRol(Rol.ADMINISTRADOR)
+
+        assertEquals(1, viewModel.usuariosFiltrados.value.size)
+        assertEquals("andres@kaiju.cl", viewModel.usuariosFiltrados.value.first().correo)
+    }
+
+    @Test
+    fun tocarElMismoRolOtraVezQuitaElFiltro() {
+        viewModel.seleccionarRol(Rol.ADMINISTRADOR)
+        viewModel.seleccionarRol(Rol.ADMINISTRADOR)
+
+        assertNull(viewModel.rolFiltro.value)
+        assertEquals(3, viewModel.usuariosFiltrados.value.size)
+    }
+
+    @Test
+    fun elRolYElTextoSeCombinan() {
+        viewModel.seleccionarRol(Rol.VENDEDOR)
+
+        viewModel.actualizarBusqueda("andr") // Andrés es administrador, no vendedor
+        assertTrue(viewModel.usuariosFiltrados.value.isEmpty())
+
+        viewModel.actualizarBusqueda("tho")
+        assertEquals(1, viewModel.usuariosFiltrados.value.size)
+    }
+
+    @Test
+    fun unaBusquedaSinResultadosNoBorraLaListaCompleta() {
+        viewModel.actualizarBusqueda("zzz")
+
+        assertTrue(viewModel.usuariosFiltrados.value.isEmpty())
+        assertEquals(3, viewModel.usuarios.value.size)
     }
 }
