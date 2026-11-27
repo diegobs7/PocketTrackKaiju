@@ -17,15 +17,16 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -33,6 +34,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -44,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.model.Usuario
+import com.example.pockettrackkaiju_tea.ui.components.DialogoServidor
 import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
 import com.example.pockettrackkaiju_tea.viewmodel.LoginViewModel
 
@@ -88,6 +93,21 @@ fun PantallaInicioSesion(
 
     val formaCampo = RoundedCornerShape(12.dp)
 
+    var mostrarServidor by remember { mutableStateOf(false) }
+    if (mostrarServidor) {
+        DialogoServidor(
+            url = estado.urlServidor,
+            error = estado.errores.errorServidor,
+            onCambiarUrl = viewModel::actualizarUrlServidor,
+            onGuardar = { if (viewModel.guardarServidor()) mostrarServidor = false },
+            onRestablecer = viewModel::restablecerServidor,
+            onCerrar = {
+                viewModel.cancelarEdicionServidor()
+                mostrarServidor = false
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -107,6 +127,14 @@ fun PantallaInicioSesion(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    IconButton(onClick = { mostrarServidor = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "Configurar servidor"
+                        )
+                    }
+                }
                 Text(
                     text = "Iniciar sesión",
                     style = MaterialTheme.typography.headlineMedium,
@@ -183,23 +211,6 @@ fun PantallaInicioSesion(
                 if (errorPassword != null && !esErrorCredenciales) {
                     MensajeErrorConIcono(errorPassword)
                 }
-
-                Spacer(Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = estado.urlServidor,
-                    onValueChange = viewModel::actualizarUrlServidor,
-                    label = { Text("Servidor") },
-                    supportingText = { Text("Dirección del backend, por ejemplo 54.12.34.56:8080") },
-                    leadingIcon = { Icon(Icons.Filled.Dns, contentDescription = null) },
-                    isError = estado.errores.errorServidor != null,
-                    shape = formaCampo,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                estado.errores.errorServidor?.let { MensajeErrorConIcono(it) }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),

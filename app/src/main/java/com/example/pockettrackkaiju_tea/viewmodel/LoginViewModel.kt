@@ -34,6 +34,44 @@ class LoginViewModel(
     fun actualizarUrlServidor(valor: String) = _estadoFormulario.update {
         it.copy(urlServidor = valor, errores = it.errores.copy(errorServidor = null))
     }
+
+    /** Valida y guarda la dirección escrita en el engranaje. Devuelve true si quedó guardada. */
+    fun guardarServidor(): Boolean {
+        val config = servidor ?: return false
+        val texto = _estadoFormulario.value.urlServidor
+        if (!config.guardar(texto)) {
+            _estadoFormulario.update {
+                it.copy(
+                    errores = it.errores.copy(
+                        errorServidor = "Ingresa una dirección válida, por ejemplo 54.12.34.56:8080."
+                    )
+                )
+            }
+            return false
+        }
+        _estadoFormulario.update {
+            it.copy(urlServidor = config.urlBase(), errores = it.errores.copy(errorServidor = null))
+        }
+        return true
+    }
+
+    /** Vuelve a la dirección por defecto y la deja visible en el campo. */
+    fun restablecerServidor() {
+        val config = servidor ?: return
+        config.restablecer()
+        _estadoFormulario.update {
+            it.copy(urlServidor = config.urlBase(), errores = it.errores.copy(errorServidor = null))
+        }
+    }
+
+    /** Descarta lo escrito sin guardar y muestra de nuevo la dirección vigente. */
+    fun cancelarEdicionServidor() {
+        val config = servidor ?: return
+        _estadoFormulario.update {
+            it.copy(urlServidor = config.urlBase(), errores = it.errores.copy(errorServidor = null))
+        }
+    }
+
     fun actualizarRecordarme(valor: Boolean) = _estadoFormulario.update { it.copy(recordarme = valor) }
 
     fun validarFormulario(): Boolean {
@@ -51,14 +89,10 @@ class LoginViewModel(
             else -> null
         }
 
-        val errorServidor = if (servidor != null && ConfigServidor.normalizar(estado.urlServidor) == null)
-            "Ingresa una dirección válida, por ejemplo 54.12.34.56:8080."
-        else null
-
         _estadoFormulario.update {
-            it.copy(errores = ErroresLogin(errorEmail, errorPassword, errorServidor))
+            it.copy(errores = ErroresLogin(errorEmail, errorPassword))
         }
-        return errorEmail == null && errorPassword == null && errorServidor == null
+        return errorEmail == null && errorPassword == null
     }
 
     fun iniciarSesion(onExito: (Usuario, Boolean) -> Unit) {
@@ -66,8 +100,6 @@ class LoginViewModel(
         if (_estadoFormulario.value.cargando) return
 
         val estado = _estadoFormulario.value
-        // Se guarda antes de llamar: la petición de login ya debe ir a la dirección nueva.
-        servidor?.guardar(estado.urlServidor)
         _estadoFormulario.update { it.copy(cargando = true) }
         viewModelScope.launch {
             try {
