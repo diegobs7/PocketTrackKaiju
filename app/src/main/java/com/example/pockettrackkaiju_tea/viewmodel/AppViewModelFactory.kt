@@ -9,7 +9,9 @@ import com.example.pockettrackkaiju_tea.repository.MovimientoRepository
 import com.example.pockettrackkaiju_tea.repository.PokemonRepository
 import com.example.pockettrackkaiju_tea.repository.ProductoRepository
 import com.example.pockettrackkaiju_tea.repository.UsuarioRepository
-import com.example.pockettrackkaiju_tea.repository.UsuarioRepositoryEnMemoria
+import com.example.pockettrackkaiju_tea.repository.UsuarioRepositoryRemoto
+import com.example.pockettrackkaiju_tea.remote.kaiju.KaijuClient
+import com.example.pockettrackkaiju_tea.util.ConfigServidor
 import com.example.pockettrackkaiju_tea.util.SesionGuardada
 
 class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
@@ -18,7 +20,8 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
     private val database = AppDatabase.getInstance(appContext)
     private val productoRepository = ProductoRepository(database.productoDao())
     private val movimientoRepository = MovimientoRepository(database.movimientoDao())
-    private val usuarioRepository = repositorioDeUsuarios
+    private val configServidor = ConfigServidor(appContext)
+    private val usuarioRepository = repositorioDeUsuarios(appContext, configServidor)
     private val pokemonRepository = PokemonRepository(PokeApiClient.api)
 
     @Suppress("UNCHECKED_CAST")
@@ -36,7 +39,7 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
             RegistroUsuarioViewModel(usuarioRepository)
 
         modelClass.isAssignableFrom(LoginViewModel::class.java) ->
-            LoginViewModel(usuarioRepository)
+            LoginViewModel(usuarioRepository, configServidor)
 
         modelClass.isAssignableFrom(SesionViewModel::class.java) ->
             SesionViewModel(usuarioRepository, SesionGuardada(appContext))
@@ -56,6 +59,21 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
     private companion object {
         // Una sola instancia para toda la app: cada pantalla crea su propia fábrica,
         // y todas deben compartir los mismos usuarios y la misma sesión.
-        val repositorioDeUsuarios: UsuarioRepository = UsuarioRepositoryEnMemoria()
+        @Volatile
+        private var repositorio: UsuarioRepository? = null
+
+        fun repositorioDeUsuarios(contexto: Context, config: ConfigServidor): UsuarioRepository =
+            repositorio ?: synchronized(this) {
+                repositorio ?: crearRepositorioRemoto(contexto, config).also { repositorio = it }
+            }
+
+        private fun crearRepositorioRemoto(contexto: Context, config: ConfigServidor): UsuarioRepository {
+            val sesion = SesionGuardada(contexto)
+            // El cliente necesita el token del repositorio y el repositorio necesita la api del cliente.
+            lateinit var remoto: UsuarioRepositoryRemoto
+            val cliente = KaijuClient(config) { remoto.tokenActual() }
+            remoto = UsuarioRepositoryRemoto(cliente.api, sesion)
+            return remoto
+        }
     }
 }
