@@ -62,7 +62,7 @@ class UsuarioRepositoryRemoto(
     }
 
     override suspend fun listar(): List<Usuario> =
-        llamar { api.listar() }.filter { it.activo }.map { it.aUsuario() }
+        llamar { api.listar() }.map { it.aUsuario() }
 
     override suspend fun crear(nombre: String, correo: String, password: String, rol: Rol): Usuario =
         llamar {
@@ -89,6 +89,13 @@ class UsuarioRepositoryRemoto(
 
     override suspend fun cambiarRol(id: Int, rol: Rol): Usuario =
         llamar { api.cambiarRol(id.toLong(), CambiarRolRequest(rol.name)) }.aUsuario()
+
+    override suspend fun desactivar(id: Int) {
+        llamar { api.desactivar(id.toLong()) }
+    }
+
+    override suspend fun reactivar(id: Int): Usuario =
+        llamar { api.reactivar(id.toLong()) }.aUsuario()
 
     override suspend fun eliminar(id: Int) {
         llamar { api.eliminar(id.toLong()) }
@@ -122,6 +129,7 @@ class UsuarioRepositoryRemoto(
         id = id.toInt(),
         nombre = nombre,
         correo = email,
-        rol = Rol.valueOf(rol)
+        rol = Rol.valueOf(rol),
+        activo = activo
     )
 }
