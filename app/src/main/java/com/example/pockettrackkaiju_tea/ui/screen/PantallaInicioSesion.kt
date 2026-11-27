@@ -17,6 +17,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Lock
@@ -182,6 +183,23 @@ fun PantallaInicioSesion(
                 if (errorPassword != null && !esErrorCredenciales) {
                     MensajeErrorConIcono(errorPassword)
                 }
+
+                Spacer(Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = estado.urlServidor,
+                    onValueChange = viewModel::actualizarUrlServidor,
+                    label = { Text("Servidor") },
+                    supportingText = { Text("Dirección del backend, por ejemplo 54.12.34.56:8080") },
+                    leadingIcon = { Icon(Icons.Filled.Dns, contentDescription = null) },
+                    isError = estado.errores.errorServidor != null,
+                    shape = formaCampo,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                estado.errores.errorServidor?.let { MensajeErrorConIcono(it) }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
