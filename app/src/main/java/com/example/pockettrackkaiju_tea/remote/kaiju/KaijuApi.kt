@@ -40,6 +40,13 @@ interface KaijuApi {
         @Body body: CambiarRolRequest
     ): UsuarioResponse
 
+    /** Desactiva la cuenta (borrado lógico): el usuario ya no puede iniciar sesión. */
+    @DELETE("api/v1/usuarios/{id}")
+    suspend fun desactivar(@Path("id") id: Long)
+
+    @PATCH("api/v1/usuarios/{id}/activar")
+    suspend fun reactivar(@Path("id") id: Long): UsuarioResponse
+
     /** Borrado permanente (DELETE /{id} solo desactiva). */
     @DELETE("api/v1/usuarios/{id}/eliminar")
     suspend fun eliminar(@Path("id") id: Long)
