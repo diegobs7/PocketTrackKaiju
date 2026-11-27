@@ -33,4 +33,12 @@ class ConfigServidorTest {
         assertNull(ConfigServidor.normalizar("http://"))
         assertNull(ConfigServidor.normalizar(":8080"))
     }
+
+    @Test
+    fun laDireccionPorDefectoEsValida() {
+        assertEquals(
+            ConfigServidor.URL_POR_DEFECTO,
+            ConfigServidor.normalizar(ConfigServidor.URL_POR_DEFECTO)
+        )
+    }
 }
