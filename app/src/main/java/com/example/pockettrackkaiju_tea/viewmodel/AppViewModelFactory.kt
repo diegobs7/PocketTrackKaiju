@@ -13,7 +13,8 @@ import com.example.pockettrackkaiju_tea.repository.UsuarioRepositoryRemoto
 import com.example.pockettrackkaiju_tea.remote.kaiju.KaijuClient
 import com.example.pockettrackkaiju_tea.util.ConfigServidor
 import com.example.pockettrackkaiju_tea.util.SesionGuardada
-
+import com.example.pockettrackkaiju_tea.remote.DolarApiClient
+import com.example.pockettrackkaiju_tea.repository.DolarRepository
 class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
 
     private val appContext = contexto.applicationContext
@@ -23,6 +24,8 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
     private val configServidor = ConfigServidor(appContext)
     private val usuarioRepository = repositorioDeUsuarios(appContext, configServidor)
     private val pokemonRepository = PokemonRepository(PokeApiClient.api)
+
+    private val dolarRepository = DolarRepository(DolarApiClient.api)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T = when {
@@ -52,6 +55,9 @@ class AppViewModelFactory(contexto: Context) : ViewModelProvider.Factory {
 
         modelClass.isAssignableFrom(EditarUsuarioViewModel::class.java) ->
             EditarUsuarioViewModel(usuarioRepository)
+
+        modelClass.isAssignableFrom(DolarViewModel::class.java) ->
+            DolarViewModel(dolarRepository)
 
         else -> throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
     } as T
