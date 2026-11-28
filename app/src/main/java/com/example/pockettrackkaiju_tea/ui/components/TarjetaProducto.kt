@@ -24,6 +24,7 @@ import com.example.pockettrackkaiju_tea.model.Producto
 fun TarjetaProducto(
     producto: Producto,
     enAlerta: Boolean,
+    precioUsd: String?=null,
     onClick: () -> Unit = {},
     onEditar: (() -> Unit)? = null,
     onEliminar: (() -> Unit)? = null
@@ -66,10 +67,15 @@ fun TarjetaProducto(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = formatearPrecio(producto.precio),
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Column{
+                    Text(
+                        text = formatearPrecio(producto.precio),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    precioUsd?.let{
+                        Text(text = it, style = MaterialTheme.typography.bodySmall)
+                    }
+                }
                 IndicadorStock(stockActual = producto.stockActual, enAlerta = enAlerta)
             }
 
