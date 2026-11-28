@@ -34,12 +34,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pockettrackkaiju_tea.model.CategoriaProducto
 import com.example.pockettrackkaiju_tea.model.Producto
+import com.example.pockettrackkaiju_tea.ui.components.BannerDolar
 import com.example.pockettrackkaiju_tea.ui.components.DialogoEliminarProducto
+import com.example.pockettrackkaiju_tea.ui.components.formatearUsd
 import com.example.pockettrackkaiju_tea.ui.components.OpcionMenu
 import com.example.pockettrackkaiju_tea.ui.components.TarjetaProducto
+import com.example.pockettrackkaiju_tea.viewmodel.AppViewModelFactory
+import com.example.pockettrackkaiju_tea.viewmodel.DolarViewModel
 import com.example.pockettrackkaiju_tea.viewmodel.InventarioViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,9 +54,11 @@ fun PantallaCatalogo(
     viewModel: InventarioViewModel,
     esAdministrador: Boolean = false,
     onEditar: (Producto) -> Unit = {},
-    onVerDetalle: (Producto) -> Unit = {}
+    onVerDetalle: (Producto) -> Unit = {},
+    dolarViewModel: DolarViewModel = viewModel(factory = AppViewModelFactory(LocalContext.current))
 ) {
     val productos by viewModel.productos.collectAsStateWithLifecycle()
+    val estadoDolar by dolarViewModel.uiState.collectAsStateWithLifecycle()
 
     var textoBusqueda by remember { mutableStateOf("") }
     var categoriaSeleccionada by remember { mutableStateOf<CategoriaProducto?>(null) }
@@ -178,7 +186,11 @@ fun PantallaCatalogo(
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        BannerDolar(
+            estado = estadoDolar,
+            onReintentar = { dolarViewModel.cargar(forzar = true) },
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -201,6 +213,7 @@ fun PantallaCatalogo(
                     TarjetaProducto(
                         producto = producto,
                         enAlerta = viewModel.estaEnAlerta(producto),
+                        precioUsd = estadoDolar.dolar?.let { formatearUsd(producto.precio, it.pesos) },
                         onClick = { onVerDetalle(producto) },
                         onEditar = if (esAdministrador) ({ onEditar(producto) }) else null,
                         onEliminar = if (esAdministrador) ({ productoAEliminar = producto }) else null
